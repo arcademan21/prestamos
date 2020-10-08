@@ -1,4 +1,7 @@
-<?php  headerAdmin($data['info']); ?>
+<?php  
+  headerAdmin($data['info']); 
+  $curr = 'EUR';
+?>
 
 <main class="app-content">
   
@@ -56,7 +59,7 @@
           <i class="icon fas fa-wallet fa-3x"></i>
           <div class="info">
             <h4>Mi cartera</h4>
-            <p><b><?= money_format('%i', $wallet) ?></b></p>
+            <p><b><?= moneyFormat($wallet, $curr) ?></b></, $currp>
           </div>
         </div>
       </div>
@@ -66,7 +69,7 @@
           <i class="icon fas fa-hand-holding-usd fa-3x"></i>
           <div class="info">
             <h4>Prestado</h4>
-            <p><b><?= money_format('%i', $total_borrowed) ?></b></p>
+            <p><b><?= moneyFormat($total_borrowed, $curr) ?></b></, $currp>
           </div>
         </div>
       </div>
@@ -76,7 +79,7 @@
           <i class="icon fas fa-clock fa-3x"></i>
           <div class="info">
             <h4>Int.Pendiente</h4>
-            <p><b><?= money_format('%i', $total_pending_interest) ?></b></p>
+            <p><b><?= moneyFormat($total_pending_interest, $curr) ?></b></, $currp>
           </div>
         </div>
       </div>
@@ -231,14 +234,14 @@
                     //$dete = strftime("%e/%b/%Y", strtotime($data['dete']));
                     $dete = date('d/m/Y H:i:s', strtotime($data['dete']));
                     $code = $data['id_customer'];
-                    $outstanding_capital = money_format('%i', $data['outstanding_capital']);
-                    $paid_capital = money_format('%i', $data['paid_capital']);
-                    $interest = money_format('%i', $data['interest']);
-                    $accrued_interest = money_format('%i', $data['accrued_interest']);
-                    $interest_paid = money_format('%i', $data['interest_paid']);
-                    $pending_interest = money_format('%i', $data['pending_interest']);
-                    $increased_debt = money_format('%i', $data['increased_debt']);
-                    $payment_month = money_format('%i', $data['payment_month']);
+                    $outstanding_capital = moneyFormat($data['outstanding_capital'], $curr);
+                    $paid_capital = moneyFormat($data['paid_capital'], $curr);
+                    $interest = moneyFormat($data['interest'], $curr);
+                    $accrued_interest = moneyFormat($data['accrued_interest'], $curr);
+                    $interest_paid = moneyFormat($data['interest_paid'], $curr);
+                    $pending_interest = moneyFormat($data['pending_interest'], $curr);
+                    $increased_debt = moneyFormat($data['increased_debt'], $curr);
+                    $payment_month = moneyFormat($data['payment_month'], $curr);
 
                     
                 ?>
