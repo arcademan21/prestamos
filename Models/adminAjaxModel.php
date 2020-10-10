@@ -478,9 +478,8 @@ public function addNewClient($params=null){
 	}else{
 		return $this->error_message('Ya existe un cliente con ese nombre o codigo.');
 	}
+
 }
-
-
 
 public function addNewLoan($params=null){
 	
@@ -667,7 +666,10 @@ public function addExistsLoan($params=null){
 			return $this->error_message('No existe ningun cliente con este nombre o codigo ');
 		}
 	}
+
 }
+
+
 /*---------------------------------*/
 
 /*---------------------------------*/
@@ -798,7 +800,6 @@ public function chargeMoney($params=null){
 
 }
 
-
 public function walletPlus($params=null){
 	
 	$sql = '
@@ -819,6 +820,7 @@ public function walletPlus($params=null){
 		'status'=>'OK',
 		'message'=>'Mi cartera fue actualiza'
 	]);
+
 }
 
 public function walletRest($params=null){
@@ -841,6 +843,7 @@ public function walletRest($params=null){
 		'status'=>'OK',
 		'message'=>'Mi cartera fue actualiza'
 	]);
+
 }
 
 public function getTotalBorrowed(){
@@ -855,7 +858,9 @@ public function getTotalBorrowed(){
 	$request = $this->select($query);
 	return $request['TOTAL_BORROWED'];
 	/*---------------------------------*/
+
 }
+
 
 /*---------------------------------*/
 
@@ -866,7 +871,7 @@ public function updateClient($params=null){
 
 public function deleteClient($params=null){
 	$sql = 'DELETE FROM customers WHERE id_customer = "'.$params->id_code.'"';
-	//$this->delete($sql);
+	$this->delete($sql);
 	return $this->success_message('Delete complete.');
 
 }

@@ -18,6 +18,7 @@ $query = '
 	SELECT DISTINCT *
 	FROM customers
 	WHERE payment_status != "pending"
+	AND payment_status != "initial"
 	ORDER BY name ASC
 ';
 

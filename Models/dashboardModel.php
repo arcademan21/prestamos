@@ -27,10 +27,12 @@ $data['alldata'] = $request;
 /*---------------------------------*/
 //OBTIENE TOTAL PRESTADO DE ESTE AÑO
 $query = '
-	SELECT 
-		SUM(outstanding_capital) AS TOTAL_BORROWED
+	SELECT DISTINCT
+		SUM(outstanding_capital) AS TOTAL_BORROWED	
 	FROM payments 
-	WHERE YEAR(dete) = YEAR(NOW()) 	
+	WHERE YEAR(dete) = YEAR(NOW())  
+	GROUP BY MONTH(dete) 
+	ASC LIMIT 12	
 ';
 
 $request = $this->select_all($query);
@@ -93,9 +95,9 @@ $query = '
 		MAX(dete) AS DATES,
 		SUM(outstanding_capital) AS BORROWED	
 	FROM payments 
-	WHERE YEAR(dete) = YEAR(NOW())
-	AND MONTH(dete) < MONTH(NOW())  
-	GROUP BY MONTH(dete) 
+	WHERE YEAR(dete) = YEAR(NOW()) 
+	AND MONTH(dete) < MONTH(NOW()) 
+	GROUP BY MONTH(dete)  
 	ASC LIMIT 12
 ';
 

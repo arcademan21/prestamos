@@ -389,7 +389,7 @@ function simple_ajax(method, params, callback){
 				if(response.status == 'OK'){
 					callback(response.data)
 				}else if(response.status == 'KO'){
-					console.log(response)
+
 					callback(response.data)
 					errorNotify({
 						title: 'Error',

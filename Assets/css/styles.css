@@ -1,20 +1,20 @@
 .app-sidebar__toggle:before{
-	content: '';
+  content: '';
 }
 
 .content-select-option-time-chart{
-	display: flex;
+  display: flex;
     position: relative;
     padding: 0 59px;
 }
 
 .modal-header{
-	background-color: #409689;
+  background-color: #409689;
     color: #fff;
 }
 
 .preview-code{
-	background: #777f8e;
+  background: #777f8e;
     padding-top: 15px;
     padding-bottom: 15px;
     border-radius: 5px;
@@ -24,7 +24,7 @@
 }
 
 .preview-code pre{
-	color: #fff;
+  color: #fff;
     font-weight: bold;
     font-size: 16px;
 }
@@ -75,15 +75,16 @@
 /*Loader*/
 
 .spinner-loader-content{
-    position: absolute;
-    display: flex;
-    align-items: center;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    justify-content: center;
-    z-index: 100;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  /*background-color: #294c46ad;*/
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  justify-content: center;
+  z-index: 100;
 }
 
 .lds-spinner {

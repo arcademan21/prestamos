@@ -43,8 +43,8 @@
       	<div class="tile">
       		<?php //echo dep($data['client']['TOTAL_INFO_HEADER']) ?>
       		<div class="row justify-content-center">
-      			<div class="col-md-3"><span class="cp-frame"></span><h5 class="title-table-client">C.pendiente: <?= money_format('%i', $data['client']['TOTAL_INFO_HEADER']['outstanding_capital']) ?></h5></div>
-      			<div class="col-md-3"><span class="ip-frame"></span><h5 class="title-table-client">I.pendiente: <?= money_format('%i', $data['client']['TOTAL_INFO_HEADER']['pending_interest']) ?></h5></div>
+      			<div class="col-md-3"><span class="cp-frame"></span><h5 class="title-table-client">C.pendiente: <?= moneyFormat($data['client']['TOTAL_INFO_HEADER']['outstanding_capital'], $curr) ?></h5></div>
+      			<div class="col-md-3"><span class="ip-frame"></span><h5 class="title-table-client">I.pendiente: <?= moneyFormat($data['client']['TOTAL_INFO_HEADER']['pending_interest'], $curr) ?></h5></div>
       		</div>
       		
       		
