@@ -4,6 +4,7 @@ class adminAjaxModel extends Mysql{
 
 public function __construct(){
 	parent::__construct();
+
 }
 
 public function updateRegisters($params=null){
@@ -16,103 +17,173 @@ public function updateRegisters($params=null){
 		//Obteniendo todos los registros...
 		$sql = '
 			SELECT 
-			MAX(dete) AS dete,
-			id_customer
-			FROM payments
-			GROUP BY client
+			MAX(payments.dete) AS dete,
+			payments.id_customer,
+			customers.updated_on
+			FROM payments, customers
+			GROUP BY payments.client
 		';
 		
 		$response = $this->select_all($sql);
+
+		//dep($response);
 
 		//Recoriendo registros en busca de fechas 
 
 		$month_and_day = date('m-d');
 		foreach ($response as $data) {
 
-			if(date('m-d', strtotime($data['dete'])) != $month_and_day){
+			if(date('m-d', strtotime($data['updated_on'])) != $month_and_day){
+				
 				if(date('Y', strtotime($data['dete'])) == date('Y')){
+					
 					//Actualiza la base de datos...
-					$month = date('m', strtotime($data['dete']));
-					for($i = $month; $i < date('m'); $i++){
-						$exect = $this->updateOneRegister($data, $i);
-						array_push($arrResult, $exect);
-					}
+					// $month = date('m', strtotime($data['dete']));
+					// for($i = $month; $i < date('m'); $i++){
+					// 	$exect = $this->updateOneRegister($data, $i);
+					// 	array_push($arrResult, $exect);
+					// }
+
+					$exect = $this->updateOneRegister($data, date('m'));
+					array_push($arrResult, $exect);
 					
 				}
 				
 			}
 		}
 
+		//dep(count($arrResult));
+
 		if(count($arrResult) > 0){
 
 			$incidents = [];
-			foreach ($arrResult as $data) {
-				$temp = json_decode($data);
-				if($temp->status == 'KO'){
-					array_push($incidents, $temp);
+			if($arrResult[0] != ''){
+				
+				foreach ($arrResult as $data) {
+				
+					$temp = json_decode($data);
+					if($temp->status == 'KO'){
+						array_push($incidents, $temp);
+					}
+					
 				}
-			}
 
-			if(count($incidents) > 0 and count($incidents) < count($response)){
-				return json_encode([
-					'status'=>'OK',
-					'message'=>'Existen incidencias',
-					'data'=>[
-						'incidentes'=>$arrResult
-					]
-				]);
-			}else if(count($incidents) == count($response)){
-				return json_encode([
-					'status'=>'KO',
-					'message'=>'Ha ocurrido un error al intentar actualizar los registros',
-					'data'=>[
-						'incidentes'=>$arrResult
-					]
-				]);
+
+				if(count($incidents) > 0 and count($incidents) < count($response)){
+					
+					$sql = '
+						UPDATE update_database 
+						SET updated_date = ?
+						WHERE id = 1
+					';
+
+					$arrval = array(date('Y-m-d H:i:s'));
+					$this->update($sql, $arrval);
+
+					return json_encode([
+						'status'=>'OK',
+						'message'=>'Existen incidencias',
+						'data'=>[
+							'incidentes'=>$arrResult
+						]
+					]);
+				}else if(count($incidents) == count($response)){
+					return json_encode([
+						'status'=>'KO',
+						'message'=>'Ha ocurrido un error al intentar actualizar los registros',
+						'data'=>[
+							'incidentes'=>$arrResult
+						]
+					]);
+				}else{
+
+					$sql = '
+						UPDATE update_database 
+						SET updated_date = ?
+						WHERE id = 1
+					';
+
+					$arrval = array(date('Y-m-d H:i:s'));
+					$this->update($sql, $arrval);
+
+					return json_encode([
+						'status'=>'OK',
+						'message'=>'Base de datos actualizada correctamente.',
+						'data'=>[
+							'incidentes'=>$arrResult
+						]
+					]);
+				}
 			}else{
 				return json_encode([
 					'status'=>'OK',
-					'message'=>'Base de datos actualizada correctamente.',
-					'data'=>[
-						'incidentes'=>$arrResult
-					]
+					'message'=>'Base de datos actualizada correctamente.'
 				]);
 			}
 
 		}else{
+
+			$sql = '
+				UPDATE update_database 
+				SET updated_date = ?
+				WHERE id = 1
+			';
+
+			$arrval = array(date('Y-m-d H:i:s'));
+			$this->update($sql, $arrval);
+
 			return json_encode([
 				'status'=>'OK',
 				'message'=>'Base de datos actualizada sin cambios.',
 			]);
 		}
+
+		
+
 	} catch (PDOException $e) {
 		echo ''.$e->getMessage();
 	}
 	
-
 }
 
 public function updateOneRegister($data, $month){
 
 	//comprobar si esta actualizado...
+
 	$sql = '
-		SELECT * 
-		FROM customers 
-		WHERE id_customer = "'.$data['id_customer'].'"
-		AND MONTH(updated_on) = MONTH(NOW())
-		AND DAY(updated_on) = DAY(NOW())
+		SELECT updated_date
+		FROM update_database
 	';
 
 	$response = $this->select($sql);
 
-	if(!$response){
-		return $this->updatedIt($data, $month);
-	}else{
-		return json_encode([
-			'status'=> 'OK',
-			'message'=> 'Base de datos actualizada sin cambios'
-		]);
+	$year_and_month = date('Y-m');
+	if(date('Y-m', strtotime($response['updated_date'])) != $year_and_month){
+		
+		$sql = '
+			SELECT * 
+			FROM customers 
+			WHERE id_customer = "'.$data['id_customer'].'"
+			AND MONTH(updated_on) = MONTH(NOW())
+			AND DAY(updated_on) = DAY(NOW())
+		';
+
+		$response = $this->select($sql);
+
+		if(!$response){
+			return $this->updatedIt($data, $month);
+		}else{
+			return json_encode([
+				'status'=> 'OK',
+				'message'=> 'Base de datos actualizada sin cambios'
+			]);
+		}
+
 	}
+
+
+
+	
 
 }	
 
@@ -149,7 +220,6 @@ public function updatedIt($data, $month){
 
 		$response = $this->select($sql);
 
-
 		// $date = $data['dete'];
 		// $month = date('m', strtotime($data['dete']));
 		// $day = date('d', strtotime($data['dete']));
@@ -179,7 +249,7 @@ public function updatedIt($data, $month){
 		$arrval = array(
 			$response['id_customer'],
 			$response['client'],
-			date('Y-'.($month+1).'-d H:i:s'),
+			date('Y-m-d H:i:s'),
 			$outstanding_capital,
 			$interest,
 			$pending_interest,
@@ -196,16 +266,21 @@ public function updatedIt($data, $month){
 		array_push($arrResult, $arrval);
 
 		if($result){
-			
+
+			$update_month = date('m')+1;
+			$update_day = date('d', strtotime($data['dete']));
+
 			$sql = '
-				UPDATE update_database 
-				SET updated_date = ?
-				WHERE id = 1
+				UPDATE customers 
+				SET updated_on = ?
+				WHERE id_customer = "'.$response['id_customer'].'"
 			';
 
-			$arrval = array(date('Y-m-d H:i:s'));
+			$arrval = array(date('Y-'.$update_month.'-'.$update_day.' H:i:s'));
 			$this->update($sql, $arrval);
 			
+			
+
 			return json_encode([
 				'status'=> 'OK',
 				'message'=> 'Base de datos actualizada',
@@ -232,7 +307,6 @@ public function updatedIt($data, $month){
 			'data'=> false
 		]);
 	}
-
 
 }
 
@@ -382,6 +456,7 @@ public function updateDatabase($params=null){
 			'data'=> false
 		]);
 	}
+
 }
 
 /*---------------------------------*/
@@ -421,6 +496,7 @@ public function logout($params=null){
 	}
 	
 }
+
 /*---------------------------------*/
 
 /*---------------------------------*/
@@ -433,7 +509,6 @@ public function addNewClient($params=null){
 		SELECT name, id_customer 
 		FROM customers
 		WHERE name = "'.$params->name.'"
-		OR id_customer = "'.$params->code.'"
 	';
 
 	$response = $this->select($sql);
@@ -497,6 +572,22 @@ public function addNewLoan($params=null){
 	if(!$response){
 
 		try {
+
+
+			// $sql = '
+			// 	SELECT initial_loan
+			// 	FROM customers
+			// 	WHERE id_customer = "'.$response['id_customer'].'"
+			// ';
+
+			// $response = $this->select($sql);
+
+			// if($response['initial_loan'] > 0){
+			// 	$initial_loan = $response['initial_loan'];
+			// }else{
+			// 	$initial_loan = $params->initial_loan;
+			// }
+			
 			
 			$addNewClient = json_decode($this->addNewClient($params));
 
@@ -525,7 +616,9 @@ public function addNewLoan($params=null){
 
 			$this->insert($sql, $data);
 			$this->changePaymentStatus('initial', $params->code);
+			$this->changeIntialLoan($params->initial_loan, $params->code);
 			$this->reduceWallet($params->initial_loan);
+			$this->depositsChargeData($params);
 
 			return $this->success_message('Nuevo prestamo realizado.');
 
@@ -549,8 +642,9 @@ public function addExistsLoan($params=null){
 			customers.interest,
 			customers.full_name AS full_name,
 			customers.phone AS phone,
+			customers.initial_loan AS initial_loan,
 			MIN(payments.pending_interest) AS pending_interest,
-			MIN(payments.outstanding_capital) AS outstanding_capital,
+			payments.outstanding_capital AS outstanding_capital,
 			SUM(payments.pending_interest) AS accrued_interest,
 			SUM(payments.interest_paid) AS interest_paid,
 			SUM(payments.paid_capital) AS paid_capital,
@@ -558,7 +652,8 @@ public function addExistsLoan($params=null){
 		FROM customers, payments
 		WHERE customers.id_customer = "'.$params->code.'"
 		AND payments.id_customer = "'.$params->code.'"
-		AND YEAR(payments.dete) <= YEAR(NOW())	
+		AND YEAR(payments.dete) <= YEAR(NOW())
+		AND MONTH(payments.dete) = MONTH(NOW())	
 	';
 
 	$response = $this->select($sql);
@@ -582,15 +677,15 @@ public function addExistsLoan($params=null){
 
 		$sql = '
 			UPDATE customers
-			SET interest=?
-			WHERE id_customer=?
+			SET interest = ?
+			WHERE id_customer = ?
 		';
 		
 		$data = array($params->interest, $params->code);
 		$this->update($sql, $data);
 
-
 		$this->changePaymentStatus('initial', $params->code);
+
 		return $this->addNewLoan($params);
 
 	}else{
@@ -618,7 +713,7 @@ public function addExistsLoan($params=null){
 				//dep($params);
 				
 				$client = $response['client'];
-				$outstanding_capital = $params->initial_loan;
+				$outstanding_capital = $response['initial_loan']+$params->initial_loan;
 				$interest = ($outstanding_capital/100) * $params->interest;
 				$accrued_interest = $response['accrued_interest'];
 				$interest_paid = $response['interest_paid'];
@@ -632,11 +727,10 @@ public function addExistsLoan($params=null){
 					$outstanding_capital,
 					$interest,
 					$accrued_interest,
-					$interest_paid,
-					//$pending_interest,
 					0,
-					$paid_capital,
-					$outstanding_capital,
+					0,
+					0,
+					$params->initial_loan,
 					0
 				);
 
@@ -644,18 +738,11 @@ public function addExistsLoan($params=null){
 
 				$this->insert($sql, $data);
 				$this->changePaymentStatus($params->code, 'pending');
+				$this->changeIntialLoan($outstanding_capital, $params->code);
+				$this->changeInterest($params->interest, $params->code);
 				$this->reduceWallet($params->initial_loan);
+				$this->depositsChargeData($params);
 
-				$sql = '
-					UPDATE customers
-					SET interest=?
-					WHERE id_customer=?
-				';
-
-				$data = array($params->interest, $params->code);
-				$this->update($sql, $data);
-
-				$this->changePaymentStatus('solved', $params->code);
 				return $this->success_message('Nuevo prestamo realizado.');
 
 			} catch (PDOException $e) {
@@ -691,22 +778,30 @@ public function chargeMoney($params=null){
 		$sql = '
 			SELECT 
 				MIN(payments.outstanding_capital) AS outstanding_capital,
+				MIN(payments.interest) AS min_interest,
 				SUM(payments.pending_interest) AS pending_interest,
-				customers.interest AS interest 
+				customers.interest AS interest,
+				customers.initial_loan AS initial_loan
 			FROM payments, customers
 			WHERE payments.id_customer = "'.$params->code.'"
+			AND customers.id_customer = "'.$params->code.'"
 		';
 
 		$response = $this->select($sql);
 
 		$outstanding_capital = $response['outstanding_capital'];
 		$pending_interest = $response['pending_interest'];
+		$initial_loan = $response['initial_loan'];
+		$interest = $response['min_interest'];
+
+		//dep($initial_loan + $pending_interest);
 	
-		if($params->mount >= ($outstanding_capital + $pending_interest)){
+		if($params->mount >= ($initial_loan + $interest)){
 			
 			$this->saveHistorial($params->code);
 			$this->changePaymentStatus('solved', $params->code);
-			$this->walletPlus($params);
+			$this->changeIntialLoan(0, $params->code);
+			$this->walletOnlyPlus($params->mount);
 			$this->deleterRegisters($params->code);
 			
 			return $this->success_message('Abono realizado correctamente. El cliente ha saldado su cuenta.');
@@ -718,11 +813,9 @@ public function chargeMoney($params=null){
 
 				
 				$sql = '
-					SELECT id_customer 
-					FROM payments
+					SELECT initial_loan 
+					FROM customers
 					WHERE id_customer = "'.$params->code.'"
-					AND MONTH(dete) = MONTH(NOW())
-					AND payment_month = 0
 				';
 
 				$response = $this->select($sql);
@@ -763,7 +856,9 @@ public function chargeMoney($params=null){
 					) VALUES (?,?,?,?,?,?,?,?,?,?,?)
 				';
 
-				$interest_less = $outstanding_capital - $params->mount;
+				$interest_less = $response['initial_loan'] - $params->mount;
+
+				//dep($interest_less);
 
 				$data = array(
 					$params->code,
@@ -772,9 +867,9 @@ public function chargeMoney($params=null){
 					$outstanding_capital - $params->mount,
 					($interest_less/100) * $this->getInterestOfClient($params->code),
 					0,
-					($params->mount/100) * $this->getInterestOfClient($params->code),
+					($response['initial_loan']/100) * $this->getInterestOfClient($params->code),
 					$this->getPendingInterest($params->code),
-					$params->mount - ($params->mount/100) * $this->getInterestOfClient($params->code),
+					$params->mount - ($response['initial_loan']/100) * $this->getInterestOfClient($params->code),
 					0,
 					$params->mount
 				);
@@ -783,7 +878,10 @@ public function chargeMoney($params=null){
 
 				$this->insert($sql, $data);
 				$this->changePaymentStatus('pending', $params->code);
-				$this->walletPlus($params);
+				$this->changeIntialLoan($response['initial_loan']-$params->mount, $params->code);
+				$this->walletOnlyPlus($params->mount);
+
+
 				return $this->success_message('Abono realizado correctamente.');
 
 				
@@ -798,6 +896,46 @@ public function chargeMoney($params=null){
 		return $this->error_message('Este cliente no tiene cuenta pendiente.');
 	}
 
+}
+
+public function depositsChargeData($params=null){
+
+	$sql = '
+		INSERT INTO deposits(
+			id_customer,
+			client,
+			dete,
+			amount
+		) VALUES (?,?,?,?)
+	';
+
+	$arrval = array(
+		$params->code,
+		$params->name,
+		date('Y-m-d H:i:s'),
+		$params->initial_loan
+	);
+
+	$this->insert($sql, $arrval);
+
+}
+
+public function walletOnlyPlus($mount){
+	
+	$sql = '
+		UPDATE wallet
+		SET mount = ?
+	';
+
+	$currentMount = $this->select('SELECT mount FROM wallet')['mount'];
+	$subTotal = $currentMount + $mount;
+
+	$arrval = array(
+		$subTotal
+	);
+
+	$this->update($sql, $arrval);
+	
 }
 
 public function walletPlus($params=null){
@@ -832,7 +970,7 @@ public function walletRest($params=null){
 
 	$currentMount = $this->select('SELECT mount FROM wallet')['mount'];
 	$total_borrowed = $this->getTotalBorrowed();
-	$subTotal = $currentMount - ($params->mount - $total_borrowed);
+	$subTotal = $currentMount - ($params->mount + $total_borrowed);
 
 	$arrval = array(
 		$subTotal
@@ -851,8 +989,8 @@ public function getTotalBorrowed(){
 	//OBTIENE TOTAL PRESTADO DE ESTE AÑO
 	$query = '
 		SELECT 
-			SUM(outstanding_capital) AS TOTAL_BORROWED
-		FROM payments  	
+		SUM(initial_loan) AS TOTAL_BORROWED
+		FROM customers 	
 	';
 
 	$request = $this->select($query);
@@ -865,13 +1003,60 @@ public function getTotalBorrowed(){
 /*---------------------------------*/
 
 
-public function updateClient($params=null){
-	return $this->success_message('Editando usuario...');
+public function editClient($params=null){
+	//dep($params);
+	try {
+		
+		$sql = '
+			SELECT * FROM customers
+			WHERE id_customer = "'.$params->code.'"
+		';
+
+		$response = $this->select($sql);
+
+		if($response){
+
+			$sql = '
+				UPDATE customers SET
+				name = ?,
+				full_name = ?,
+				phone = ?,
+				interest = ?,
+				id_customer = ?
+				WHERE name = "'.$params->name.'"
+			';
+
+			$arrval = array(
+				$params->name,
+				$params->full_name,
+				$params->phone,
+				$params->interest,
+				$params->code
+			);
+
+			$response = $this->update($sql, $arrval);
+
+			return $this->success_message('El cliente fue actualizado ', ['data'=>$params]);
+
+		}else{
+			return $this->error_message('Error: ha sucesido un error inesperado.., Es posible que no existan registros.');
+		}
+
+	} catch (PDOException $e) {
+		return $this->error_message('Error: ha sucesido un error inesperado.., Es posible que ya exista un cliente con ese codigo asignado.');
+	}
+
+
 }
 
 public function deleteClient($params=null){
-	$sql = 'DELETE FROM customers WHERE id_customer = "'.$params->id_code.'"';
-	$this->delete($sql);
+	
+	$this->saveHistorial($params->id_code);
+	
+	$sql = 'DELETE FROM customers WHERE id_customer = "'.$params->id_code.'"'; $this->delete($sql);
+	$sql = 'DELETE FROM payments WHERE id_customer = "'.$params->id_code.'"'; $this->delete($sql);
+	$sql = 'DELETE FROM deposits WHERE id_customer = "'.$params->id_code.'"'; $this->delete($sql);
+	
 	return $this->success_message('Delete complete.');
 
 }

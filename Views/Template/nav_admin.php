@@ -81,6 +81,7 @@
         <i class="treeview-indicator fa fa-angle-right"></i>
       </a>
       <ul class="treeview-menu">
+        <li><a class="treeview-item" href="<?php echo base_url() ?>/historial"><i class="icon fas fa-file-invoice"></i> Historial</a></li>
         <li><a class="treeview-item" href="<?php echo base_url() ?>/invoices"><i class="icon fas fa-file-invoice"></i> Facturas</a></li>
         <li><a class="treeview-item" href="<?php echo base_url() ?>/balance"><i class="icon fas fa-balance-scale"></i> Balances</a></li> 
       </ul>

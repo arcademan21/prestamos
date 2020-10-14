@@ -14,7 +14,7 @@ $query = '
 	SELECT DISTINCT *
 	FROM customers
 	WHERE id_customer = "'.$client_code.'"
-	OR name LIKE "%'.strtolower($client_code).'%"
+	OR name = "'.strtolower($client_code).'"
 ';
 
 $request = $this->select_all($query);
@@ -37,7 +37,7 @@ $query = '
 	outstanding_capital
 	FROM payments
 	WHERE id_customer = "'.$client_code.'"
-	OR client LIKE "%'.strtolower($client_code).'%"
+	OR client = "'.strtolower($client_code).'"
 	ORDER BY dete DESC
 ';
 
@@ -50,7 +50,7 @@ $query = '
 	amount
 	FROM deposits
 	WHERE id_customer = "'.$client_code.'"
-	OR client LIKE "%'.strtolower($client_code).'%"
+	OR client = "'.strtolower($client_code).'"
 ';
 
 $request = $this->select_all($query);
@@ -66,7 +66,7 @@ $query = '
 	outstanding_capital
 	FROM payments
 	WHERE id_customer = "'.$client_code.'" 
-	OR client LIKE "%'.strtolower($client_code).'%"
+	OR client = "'.strtolower($client_code).'"
 	ORDER BY dete DESC
 	LIMIT 1
 ';
@@ -74,16 +74,49 @@ $query = '
 $request = $this->select($query);
 $data['global'] = $request;
 
-$query = '
-	SELECT DISTINCT
-	SUM(pending_interest) AS pending_interest,
-	MIN(outstanding_capital) AS outstanding_capital
-	FROM payments
-	WHERE id_customer = "'.$client_code.'" 
+//-------------------------------------------
+
+$sql = '
+	SELECT initial_loan, payment_status
+	FROM customers
+	WHERE id_customer = "'.$client_code.'"
 ';
 
-$request = $this->select($query);
+$request = $this->select($sql);
+
+if($request['initial_loan'] == 0 AND $request['payment_status'] = 'initial'){
+	
+	$sql = '
+		UPDATE customers SET
+		initial_loan = ?
+		WHERE id_customer = "'.$client_code.'"
+	';
+
+	$arrval = array(
+		$this->select('
+			SELECT MAX(outstanding_capital) AS outstanding_capital
+			FROM payments
+			WHERE id_customer = "'.$client_code.'"
+		')['outstanding_capital']
+	);
+
+	$this->update($sql, $arrval);
+}
+
+$sql = '
+	SELECT DISTINCT
+	payments.pending_interest AS pending_interest,
+	customers.initial_loan AS outstanding_capital
+	FROM payments, customers
+	WHERE payments.id_customer = "'.$client_code.'"
+	AND customers.id_customer = "'.$client_code.'"
+';
+
+$request = $this->select($sql);
+
 $data['TOTAL_INFO_HEADER'] = $request;
+
+//--------------------------------------------
 
 return $data;
 

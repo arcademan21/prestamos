@@ -240,9 +240,6 @@ class Mysql extends Connection{
 			$request = $this->insert($sql, $arrval);	
 		}
 
-		
-		
-
 	}
 
 	public function deleterRegisters($code=null){
@@ -263,6 +260,30 @@ class Mysql extends Connection{
 		';
 
 		$arrval = array($status, $code);
+
+		$result = $this->update($sql, $arrval);
+	}
+
+	public function changeIntialLoan($mount, $code){
+		$sql = '
+			UPDATE customers
+			SET initial_loan = ?
+			WHERE id_customer = ? 
+		';
+
+		$arrval = array($mount, $code);
+
+		$result = $this->update($sql, $arrval);
+	}
+
+	public function changeInterest($percent, $code){
+		$sql = '
+			UPDATE customers
+			SET interest = ?
+			WHERE id_customer = ? 
+		';
+
+		$arrval = array($percent, $code);
 
 		$result = $this->update($sql, $arrval);
 	}

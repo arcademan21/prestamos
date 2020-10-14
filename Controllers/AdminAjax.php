@@ -74,7 +74,9 @@ public function updateRegisters($params=null){
 	return $this->model->updateRegisters($params);
 }
 
-
+public function editClient($params=null){
+	return $this->model->editClient($params);
+}
 
 
 

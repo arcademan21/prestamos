@@ -51,7 +51,7 @@
 	            	<div class="col-md-6">
 	            		<div class="form-group">
 			                <label class="control-label" for="code">Codigo</label>
-			                <input class="form-control" type="number" id="code" placeholder="Codig de referencia..." required>
+			                <input class="form-control" type="text" id="code" placeholder="Codig de referencia..." required>
 			            </div>
 	            	</div>
 	            </div>

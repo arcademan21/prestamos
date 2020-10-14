@@ -10,9 +10,38 @@ public function __construct(){
 
 public function getAllData(){
 
+$data = [];
+
+//OBTIENE TOTAL PRESADO DEL MES
+/*---------------------------------*/
+$query = '
+	SELECT DISTINCT
+		SUM(amount) AS BORROWED_OF_THIS_MONTH	
+	FROM deposits 
+	WHERE MONTH(dete) = MONTH(NOW()) 
+	AND YEAR(dete) = YEAR(NOW())	
+';
+
+$request = $this->select_all($query);
+$data['TOTAL_BORROWED_MONTH'] = $request;
+/*---------------------------------*/
+
+//OBTIENE CAPITAL ABONADO DEL MES
+/*---------------------------------*/
+$query = '
+	SELECT DISTINCT
+		SUM(paid_capital) AS CAPITAL_OF_THIS_MONTH	
+	FROM payments 
+	WHERE MONTH(dete) = MONTH(NOW()) 
+	AND YEAR(dete) = YEAR(NOW())	
+';
+
+$request = $this->select_all($query);
+$data['TOTAL_CAPITAL_MONTH'] = $request;
+/*---------------------------------*/
+
 //OBTIENE TOTAL CLIENTES
 /*---------------------------------*/
-$data = [];
 
 $query = '
 	SELECT *
@@ -25,14 +54,11 @@ $data['alldata'] = $request;
 /*---------------------------------*/
 
 /*---------------------------------*/
-//OBTIENE TOTAL PRESTADO DE ESTE AÑO
+//OBTIENE CAPITAL TOTAL PENDIENTE DE ESTE AÑO
 $query = '
-	SELECT DISTINCT
-		SUM(outstanding_capital) AS TOTAL_BORROWED	
-	FROM payments 
-	WHERE YEAR(dete) = YEAR(NOW())  
-	GROUP BY MONTH(dete) 
-	ASC LIMIT 12	
+	SELECT 
+	SUM(initial_loan) AS TOTAL_BORROWED
+	FROM customers	
 ';
 
 $request = $this->select_all($query);
@@ -46,10 +72,25 @@ $query = '
 		SUM(pending_interest) AS PENDING_INTEREST
 	FROM payments
 	WHERE YEAR(dete) = YEAR(NOW())
+	AND MONTH(dete) = MONTH(NOW())
 ';
 
 $request = $this->select_all($query);
 $data['PENDING_INTEREST'] = $request;
+/*---------------------------------*/
+
+//OBTIENE INTERES TOTAL PENDIENTE DE ESTE MES
+/*---------------------------------*/
+$query = '
+	SELECT 
+		SUM(pending_interest) AS PENDING_INTEREST
+	FROM payments
+	WHERE MONTH(dete) = MONTH(NOW())
+	AND YEAR(dete) = YEAR(NOW())
+';
+
+$request = $this->select_all($query);
+$data['PENDING_INTEREST_OF_THIS_MONTH'] = $request;
 /*---------------------------------*/
 
 //OBTIENE NUMERO TOTAL DE CUENTAS SALDADAS
@@ -89,51 +130,76 @@ $data['CLIENTS'] = $request;
 /*---------------------------------*/
 //OBTIENE DATOS DE ESTADISTICAS
 
-//Dinero prestado
+//Capital pendiente
 $query = '
 	SELECT DISTINCT
 		MAX(dete) AS DATES,
 		SUM(outstanding_capital) AS BORROWED	
 	FROM payments 
 	WHERE YEAR(dete) = YEAR(NOW()) 
-	AND MONTH(dete) < MONTH(NOW()) 
-	GROUP BY MONTH(dete)  
-	ASC LIMIT 12
+	AND MONTH(dete) < MONTH(NOW())
+	GROUP BY MONTH(dete)   
+    ORDER BY MONTH(dete)
+	ASC LIMIT 12	
 ';
 
 $request = $this->select_all($query);
 $data['STADISTICS_BORROWED_MONTH'] = $request;
 
-//Dinero pendiente
+//Capital abonado 
 $query = '
-	SELECT DISTINCT
-		dete AS DATES,
-		SUM(pending_interest) AS PENDING_INTEREST
-	FROM payments 
-	WHERE YEAR(dete) = YEAR(NOW())
-	AND MONTH(dete) < MONTH(NOW())  
-	GROUP BY MONTH(dete) 
-	ASC LIMIT 12
-';
+	
 
-$request = $this->select_all($query);
-$data['STADISTICS_PENDING_INTEREST_MONTH'] = $request;
-
-//Dinero pagado
-$query = '
 	SELECT DISTINCT
-		dete AS DATES,
-		SUM(paid_capital) AS PAID_CAPITAL
+		MAX(dete) AS DATES,
+		SUM(paid_capital) AS PAID_CAPITAL	
 	FROM payments 
-	WHERE YEAR(dete) = YEAR(NOW())
-	AND MONTH(dete) < MONTH(NOW())  
-	GROUP BY MONTH(dete) 
+	WHERE YEAR(dete) = YEAR(NOW()) 
+	AND MONTH(dete) < MONTH(NOW())
+	GROUP BY MONTH(dete)   
+    ORDER BY MONTH(dete)
 	ASC LIMIT 12
 ';
 
 $request = $this->select_all($query);
 $data['STADISTICS_PAID_CAPITAL_MONTH'] = $request;
 /*---------------------------------*/
+
+//Interes pendiente
+$query = '
+	
+	SELECT DISTINCT
+		MAX(dete) AS DATES,
+		SUM(pending_interest) AS PENDING_INTEREST	
+	FROM payments 
+	WHERE YEAR(dete) = YEAR(NOW()) 
+	AND MONTH(dete) < MONTH(NOW())
+	GROUP BY MONTH(dete)   
+    ORDER BY MONTH(dete)
+	ASC LIMIT 12
+';
+
+$request = $this->select_all($query);
+$data['STADISTICS_PENDING_INTEREST_MONTH'] = $request;
+
+//Interes abonado
+$query = '
+	
+	SELECT DISTINCT
+		MAX(dete) AS DATES,
+		SUM(interest_paid) AS INTEREST_PAID	
+	FROM payments 
+	WHERE YEAR(dete) = YEAR(NOW()) 
+	AND MONTH(dete) < MONTH(NOW())
+	GROUP BY MONTH(dete)   
+    ORDER BY MONTH(dete)
+	ASC LIMIT 12
+';
+
+$request = $this->select_all($query);
+$data['STADISTICS_INTEREST_PAID_MONTH'] = $request;
+
+
 
 /*---------------------------------*/
 //OBTIENE DATOS DE MI CARTERA

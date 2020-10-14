@@ -37,6 +37,7 @@
     width: 10px;
     height: 10px;
     background: #f75252;
+    border-radius: 10px;
     position: relative;
     float: left;
     padding: 10px;
@@ -47,6 +48,18 @@
     width: 10px;
     height: 10px;
     background: #f5d944;
+    border-radius: 10px;
+    position: relative;
+    float: left;
+    padding: 10px;
+    margin-right: 6px;
+}
+
+.ipercent-frame{
+    width: 10px;
+    height: 10px;
+    background: #44f5ed;
+    border-radius: 10px;
     position: relative;
     float: left;
     padding: 10px;

@@ -52,7 +52,7 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label class="control-label" for="code">Codigo</label>
-                          <input type="text" class="form-control" value="001-" id="code" placeholder="Codigo de referencia...">
+                          <input type="text" class="form-control" id="code" placeholder="Codigo de referencia...">
                         </div>
                       </div>
                     </div>
@@ -73,12 +73,12 @@
                       <div class="row">
                         
                         <div class="col-md-3">
-                          <input type="number" class="form-control" id="initial_loan" placeholder="0" style="position: relative; float: left; width: 65%;" required> 
+                          <input type="number" class="form-control" id="initial_loan" placeholder="0" style="position: relative; float: left; width: 65%;"  required> 
                           <span style="position: relative; float: left; font-size: 25px; margin-left: 5px;">€</span>
                         </div>
 
                         <div class="col-md-2">
-                          <input type="number" class="form-control" value="10" id="interest" placeholder="10%" style="position: relative; float: left; width: 65%;" required> 
+                          <input type="number" class="form-control" value="10" id="interest" step="0.1" placeholder="10%" style="position: relative; float: left; width: 65%;" required> 
                           <span style="position: relative; float: left; font-size: 25px; margin-left: 5px;">%</span>
                         </div>
                         
@@ -155,12 +155,12 @@
                       <div class="row">
                         
                         <div class="col-md-3">
-                          <input type="number" class="form-control" id="initial_loan_exists" style="position: relative; float: left; width: 65%;" required> 
+                          <input type="number" class="form-control" id="initial_loan_exists" style="position: relative; float: left; width: 65%;"  required> 
                           <span style="position: relative; float: left; font-size: 25px; margin-left: 5px;">€</span>
                         </div>
 
                         <div class="col-md-2">
-                          <input type="number" class="form-control" id="interst_exists" value="10" placeholder="10%" style="position: relative; float: left; width: 65%;" required> 
+                          <input type="number" class="form-control" id="interst_exists" value="10" step="0.1" placeholder="10%" style="position: relative; float: left; width: 65%;" required> 
                           <span style="position: relative; float: left; font-size: 25px; margin-left: 5px;">%</span>
                         </div>
                         

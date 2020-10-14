@@ -65,8 +65,8 @@
 
                 <div class="bs-component">
 			        <ul class="nav nav-tabs">
-			            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#insert_money"><i class="fas fas fa-plus-circle"></i> Añadir dinero</a></li>
-			            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#money_out"><i class="fas fa-clipboard-list"></i> Sacar dinero</a></li>
+			            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#insert_money"><i class="fas fas fa-plus-circle"></i> Sumar dinero</a></li>
+			            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#money_out"><i class="fas fa-minus-circle"></i> Restar dinero</a></li>
 	                </ul>
 	                <div class="tab-content" id="myTabContent">
 			            <div class="tab-pane fade active show" id="insert_money">
@@ -90,7 +90,7 @@
 					                      <div class="row">
 					                        
 					                        <div class="col-md-3">
-					                          <input type="number" class="form-control" id="plus-wallet" value="0" placeholder="0" style="position: relative; float: left; width: 65%;"> 
+					                          <input type="number" class="form-control" id="plus-wallet" value="0" placeholder="0" step="0.1" style="position: relative; float: left; width: 65%;"> 
 					                          <span style="position: relative; float: left; font-size: 25px; margin-left: 5px;">€</span>
 					                        </div>
 					                        
@@ -133,7 +133,7 @@
 					                    <div class="row">
 					                        
 					                        <div class="col-md-3">
-					                          <input type="number" class="form-control" id="rest-wallet" value="0" placeholder="0" style="position: relative; float: left; width: 65%;"> 
+					                          <input type="number" class="form-control" id="rest-wallet" value="0" placeholder="0" step="0.1" style="position: relative; float: left; width: 65%;"> 
 					                          <span style="position: relative; float: left; font-size: 25px; margin-left: 5px;">€</span>
 					                        </div>
 					                        

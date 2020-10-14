@@ -37,10 +37,10 @@ function balanceDate(ctx, data, options){
 
 	const {
 		fechas,
-		prestado,
+		capital_pendiente,
 		interes_pendiente,
-		capital_abonado
-		// interes_abonado,
+		capital_abonado,
+		interes_abonado
 		// interes_pendiente	
 	} = data
 
@@ -51,23 +51,32 @@ function balanceDate(ctx, data, options){
 			datasets: [
 				
 				{
-					label: 'DINERO PRESTADO',
-					data: prestado.slice(global_margin,global_count).map(item => item.monto),
+					label: 'CAPITAL PENDIENTE',
+					data: capital_pendiente.slice(global_margin,global_count).map(item => item.monto),
 					borderColor: '#00fff5',
+					backgroundColor: '#00fff5'
 				},
 
 				{
 					label: 'CAPITAL ABONADO',
 					data: capital_abonado.slice(global_margin,global_count).map(item => item.monto),
 					borderColor: 'green',
+					backgroundColor: 'green'
 				},
 
 				{
 					label: 'INTERES PENDIENTE',
 					data: interes_pendiente.slice(global_margin,global_count).map(item => item.monto),
 					borderColor: 'orange',
-				}
+					backgroundColor: 'orange'
+				},
 
+				{
+					label: 'INTERES ABONADO',
+					data: interes_abonado.slice(global_margin,global_count).map(item => item.monto),
+					borderColor: 'purple',
+					backgroundColor: 'purple'
+				}
 				
 				
 
@@ -128,10 +137,10 @@ function balanceDate(ctx, data, options){
 				},
 				point: {
 					radius: 6,
-					borderWidth: 3,
+					borderWidth: 6,
 					backgroundColor: '#fff',
-					hoverRadius: 8,
-					hoverBorderWidth: 3
+					hoverRadius: 12,
+					hoverBorderWidth: 6
 				}
 			},
 			tooltips: {
@@ -155,7 +164,25 @@ function balanceDate(ctx, data, options){
 			}
 		}
 	})
+
+	//console.log(chart)
 }
+
+
+// tooltips: {
+// 	callbacks: {
+// 		labelColor: function ( tooltipItem, chart) {
+// 			return {
+// 				borderColor: 'rgb (255, 0, 0)', 
+// 				backgroundColor: 'rgb (255, 0, 0)'
+// 			};
+// 		}, 
+// 		labelTextColor: function (tooltipItem, chart) {
+// 			return '# 543453' ;
+// 		}
+// 	}
+// }
+
 
 function renderCharts(data, options){
 	
@@ -265,7 +292,7 @@ function setOptionsDataTables(options){
       },
 
       sLengthMenu: 'Mostrar _MENU_ registros',
-      sEmptyTable: 'No existen registros. <br>Este cliente no tiene cuenta pendiente.',
+      sEmptyTable: 'No existen registros.',
       sInfoEmpty: 'No hay registros que mostrar...',
       //sInfoFiltered:  - Total _MAX_,
       sInfo: 'Mostrando _START_ de _END_ - total _TOTAL_ registros',
@@ -298,6 +325,8 @@ function modalEditClient(){
 	$('#formEditUser').find($('#name')).val(global_data_modal.name)
 	$('#formEditUser').find($('#full_name')).val(global_data_modal.full_name)
 	$('#formEditUser').find($('#phone')).val(global_data_modal.phone)
+	$('#formEditUser').find($('#interest')).val(global_data_modal.interest)
+	$('#formEditUser').find($('#code')).val(global_data_modal.id_customer)
 }
 
 function deleteClient(id_code){
@@ -703,8 +732,34 @@ $('form').submit(function(e){
    		case 'charge-form' : chargeMoney(Elem); break;	
    		case 'wallet-plus' : walletPlus(Elem); break;
    		case 'wallet-rest' : walletRest(Elem); break;
+   		case 'formEditUser' : editClient(Elem); break;
    	}
 })
+
+function editClient(form){
+	
+	let name = $(form).find($('#name')).val()
+	let full_name = $(form).find($('#full_name')).val()
+	let phone = $(form).find($('#phone')).val()
+	let interest = $(form).find($('#interest')).val()
+	let code = $(form).find($('#code')).val()
+
+	simple_ajax('editClient',{
+		name: name,
+		full_name: full_name,
+		phone: phone,
+		interest: interest,
+		code: code
+	}, function(data){
+		confirmNotify({
+			title: 'Cliente actualizado',
+			text: 'Los datos del cliente han sido actualizados correctamente.',
+			icon: 'success',
+			confirm_button_text: 'OK',
+			onClose: null
+		})
+	})
+}
 
 function walletPlus(form){
 	let mount = $(form).find($('#plus-wallet')).val()
@@ -713,12 +768,11 @@ function walletPlus(form){
 			title: 'Cartera actualizada',
 			text: 'Su cartera a sido actualizada',
 			icon: 'success',
-			confirmButtonText: 'OK',
+			confirm_button_text: 'OK',
 			onClose: null
 		})
 	})
 }
-
 
 function walletRest(form){
 	let mount = $(form).find($('#rest-wallet')).val()
@@ -727,7 +781,7 @@ function walletRest(form){
 			title: 'Cartera actualizada',
 			text: 'Su cartera a sido actualizada',
 			icon: 'success',
-			confirmButtonText: 'OK',
+			confirm_button_text: 'OK',
 			onClose: null
 		})
 	})

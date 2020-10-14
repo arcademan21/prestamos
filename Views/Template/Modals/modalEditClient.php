@@ -15,9 +15,6 @@
           <div class="tile-body">
             <form id="formEditUser" name="formEditUser">
 
-              
-              
-              
               <div class="form-group">
                 <label class="control-label" for="name">Nombre</label>
                 <input type="text" class="form-control" name="name" id="name" placeholder="Inserta el nombre...">
@@ -33,11 +30,18 @@
                 <input type="text" class="form-control" name="phone" id="phone" placeholder="Inserta el telefono...">
               </div>
 
+
               <div class="row">
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label class="control-label" for="interest">Interes</label>
+                    <input type="number" class="form-control" name="interest" id="interest" step="0.1" placeholder="0">
+                  </div>
+                </div>
                 <div class="col-md-5">
                   <div class="form-group">
                     <label class="control-label" for="code">Codigo</label>
-                    <input type="number" class="form-control" name="code" id="code" placeholder="Codigo de referencia...">
+                    <input type="text" class="form-control" name="code" id="code" placeholder="Codigo de referencia...">
                   </div>
                 </div>
               </div>

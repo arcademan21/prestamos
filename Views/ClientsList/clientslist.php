@@ -64,6 +64,8 @@
 		                    $client_data['name'] = $client['name'];
 		                    $client_data['full_name'] = $client['full_name'];
 		                    $client_data['phone'] = $client['phone'];
+		                    $client_data['interest'] = $client['interest'];
+		                    $client_data['id_customer'] = $client['id_customer'];
 
 		                    $client_data_json = json_encode($client_data);
 		                    

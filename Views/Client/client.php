@@ -1,6 +1,6 @@
 <?php 
   headerAdmin($data['info']);
-  getModal('modalDetailsClient', $data['client']);
+  //getModal('modalDetailsClient', $data['client']);
   $curr = 'EUR';
 ?>
 
@@ -8,6 +8,7 @@
 <main class="app-content">
   
   <div class="app-title">
+    
     <div>
       <h1>
         <i class="fas fa-user"></i> &nbsp;
@@ -16,9 +17,9 @@
       </h1>
       <p><?php echo $data['info']->page_subtitle ?></p>
     </div>
+
     <ul class="app-breadcrumb breadcrumb">
-      
-      
+        
       <?php  
         $temp = $data['client']['customer'][0]['payment_status'];
         if($temp == 'pending'){
@@ -29,24 +30,31 @@
           $payment_status = 'Inicial';
         }
       ?>
+      
       <li class="breadcrumb-item">Fecha de inicio: <b> &nbsp; <?= ucwords(strftime("%B %Y", strtotime($data['client']['customer'][0]['start_month']))) ?></b></li>
       <li class="breadcrumb-item">Estado de la deuda: &nbsp; <b><?= $payment_status ?></b></li>
-
-      <!-- <li class="breadcrumb-item"><a href="#"><?php echo $data->page_tag ?></a></li> -->
+      
     </ul>
+
+    
+
   </div>
+
+
 
   
 
   <div class="row">
     <div class="col-md-12">
       	<div class="tile">
-      		<?php //echo dep($data['client']['TOTAL_INFO_HEADER']) ?>
-      		<div class="row justify-content-center">
-      			<div class="col-md-3"><span class="cp-frame"></span><h5 class="title-table-client">C.pendiente: <?= moneyFormat($data['client']['TOTAL_INFO_HEADER']['outstanding_capital'], $curr) ?></h5></div>
-      			<div class="col-md-3"><span class="ip-frame"></span><h5 class="title-table-client">I.pendiente: <?= moneyFormat($data['client']['TOTAL_INFO_HEADER']['pending_interest'], $curr) ?></h5></div>
-      		</div>
       		
+      		<?php //echo dep($data['client']['TOTAL_INFO_HEADER']) ?>
+
+      		<div class="row justify-content-end">
+      			<div class="col-md-4"><span class="cp-frame"></span><h5 class="title-table-client">C.pendiente: <?= moneyFormat($data['client']['TOTAL_INFO_HEADER']['outstanding_capital'], $curr) ?></h5></div>
+      			<div class="col-md-4"><span class="ip-frame"></span><h5 class="title-table-client">I.pendiente: <?= moneyFormat($data['client']['TOTAL_INFO_HEADER']['pending_interest'], $curr) ?></h5></div>
+      			<div class="col-md-3"><span class="ipercent-frame"></span><h5 class="title-table-client">Interes del <?= $data['client']['customer'][0]['interest'].'%' ?></h5></div>
+      		</div>
       		
 	        <div class="tile-body">
 	          <div class="table-responsive">
