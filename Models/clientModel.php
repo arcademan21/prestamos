@@ -84,7 +84,7 @@ $sql = '
 
 $request = $this->select($sql);
 
-if($request['initial_loan'] == 0 AND $request['payment_status'] = 'initial'){
+if($request['initial_loan'] == 0 AND $request['payment_status'] == 'initial'){
 	
 	$sql = '
 		UPDATE customers SET

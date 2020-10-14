@@ -808,10 +808,8 @@ public function chargeMoney($params=null){
 
 		}else{
 			
-
 			try {
 
-				
 				$sql = '
 					SELECT initial_loan 
 					FROM customers
@@ -820,7 +818,7 @@ public function chargeMoney($params=null){
 
 				$response = $this->select($sql);
 
-				//var_dump($response);
+				
 
 				$sql = '
 					INSERT INTO deposits(
