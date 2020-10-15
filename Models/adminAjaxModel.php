@@ -789,12 +789,15 @@ public function chargeMoney($params=null){
 
 		$response = $this->select($sql);
 
-		$outstanding_capital = $response['outstanding_capital'];
+		//$outstanding_capital = $response['outstanding_capital'];
+		$outstanding_capital = $response['initial_loan'];
 		$pending_interest = $response['pending_interest'];
 		$initial_loan = $response['initial_loan'];
 		$interest = $response['min_interest'];
 
 		//dep($initial_loan + $pending_interest);
+
+
 	
 		if($params->mount >= ($initial_loan + $interest)){
 			
@@ -857,19 +860,20 @@ public function chargeMoney($params=null){
 				';
 
 				$interest_less = $response['initial_loan'] - $params->mount;
-
+				$interest_paid = ($params->mount/100) * $this->getInterestOfClient($params->code);
+				$paid_capital = $params->mount - ($params->mount/100) * $this->getInterestOfClient($params->code);
 				//dep($interest_less);
 
 				$data = array(
 					$params->code,
 					$params->name,
 					date('Y-m-d H:i:s'),
-					$outstanding_capital - $params->mount,
+					$response['initial_loan']-$paid_capital,
 					($interest_less/100) * $this->getInterestOfClient($params->code),
 					0,
-					($response['initial_loan']/100) * $this->getInterestOfClient($params->code),
+					$interest_paid,
 					$this->getPendingInterest($params->code),
-					$params->mount - ($response['initial_loan']/100) * $this->getInterestOfClient($params->code),
+					$paid_capital,
 					0,
 					$params->mount
 				);
@@ -878,7 +882,7 @@ public function chargeMoney($params=null){
 
 				$this->insert($sql, $data);
 				$this->changePaymentStatus('pending', $params->code);
-				$this->changeIntialLoan($response['initial_loan']-$params->mount, $params->code);
+				$this->changeIntialLoan($response['initial_loan']-$paid_capital, $params->code);
 				$this->walletOnlyPlus($params->mount);
 
 

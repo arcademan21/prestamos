@@ -305,7 +305,7 @@ function setOptionsDataTables(options){
     }
 
 	table = $('#sampleTable').DataTable({
-		order: [[ 6, "desc" ]],
+		order: [[ 0, "desc" ]],
 		pageLength: options.pageLength,
     	lengthMenu: options.lengthMenu,
 	    oLanguage: spanish,   

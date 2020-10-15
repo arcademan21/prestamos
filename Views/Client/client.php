@@ -62,14 +62,16 @@
 	              <thead>
 	                <tr>
 	                  <th>Fecha</th>
-	                  <th>Ab.mes</th>
+	                 
+	                  <th>Interes</th>
+	                  <th>I.acumulado</th>
 	                  <th>I.abonado</th>
-	                  <th>C.abonado</th>
 	                  <th>I.pendiente</th>
+	                  
+	                  <th>Capital prestado</th>
+	                  <th>C.Abonado del mes</th>
+	                  <th>C.abonado general</th>
 	                  <th>C.pendiente</th>
-	   				  <th>Interes</th>
-	   				  <th>I.acumulado</th>
-	                  <th>Au.deuda</th> 
 	                </tr>
 	              </thead>
 	              <tbody>
@@ -89,14 +91,14 @@
 	                ?>
 	                <tr>
 	                  <td><?= $dete ?></td>
-	                  <td><?= $payment_month ?></td>
-	                  <td><?= $interest_paid ?></td>
-	                  <td><?= $paid_capital ?></td>
-	                  <td><?= $pending_interest ?></td>
-	                  <td><?= $outstanding_capital ?></td>
 	                  <td><?= $interest ?></td>
 	                  <td><?= $accrued_interest ?></td>
-	                  <td><?= $increased_debt ?></td> 
+	                  <td><?= $interest_paid ?></td>
+	                  <td><?= $pending_interest ?></td>
+	                  <td><?= $increased_debt ?></td>
+	                  <td><?= $payment_month ?></td>
+	                  <td><?= $paid_capital ?></td>
+	                  <td><?= $outstanding_capital ?></td> 
 	                </tr>
 	            	<?php } ?>
 	                
