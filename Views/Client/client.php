@@ -32,7 +32,19 @@
       ?>
       
       <li class="breadcrumb-item">Fecha de inicio: <b> &nbsp; <?= ucwords(strftime("%B %Y", strtotime($data['client']['customer'][0]['start_month']))) ?></b></li>
-      <li class="breadcrumb-item">Estado de la deuda: &nbsp; <b><?= $payment_status ?></b></li>
+      
+      <?php  
+
+		if($payment_status == 'Inicial'){
+			$css_state = 'initial_state';
+		}else if($payment_status == 'Solventada'){
+			$css_state = 'solved_state';
+		}else if($payment_status == 'Pendiente'){
+			$css_state = 'pending_state';
+		}
+      ?>
+
+      <li class="breadcrumb-item">Estado de la deuda: &nbsp; <b class="<?= $css_state ?>"><?= $payment_status ?></b></li>
       
     </ul>
 
@@ -52,8 +64,8 @@
 
       		<div class="row justify-content-end">
       			<div class="col-md-4"><span class="cp-frame"></span><h5 class="title-table-client">C.pendiente: <?= moneyFormat($data['client']['TOTAL_INFO_HEADER']['outstanding_capital'], $curr) ?></h5></div>
-      			<div class="col-md-4"><span class="ip-frame"></span><h5 class="title-table-client">I.pendiente: <?= moneyFormat($data['client']['TOTAL_INFO_HEADER']['pending_interest'], $curr) ?></h5></div>
-      			<div class="col-md-3"><span class="ipercent-frame"></span><h5 class="title-table-client">Interes del <?= $data['client']['customer'][0]['interest'].'%' ?></h5></div>
+      			<div class="col-md-4"><span class="ip-frame"></span><h5 class="title-table-client">I.total: <?= moneyFormat($data['client']['TOTAL_INFO_HEADER']['pending_interest'], $curr) ?></h5></div>
+      			<div class="col-md-3"><span class="ipercent-frame"></span><h5 class="title-table-client">Porcentaje <?= $data['client']['customer'][0]['interest'].'%' ?></h5></div>
       		</div>
       		
 	        <div class="tile-body">
@@ -64,13 +76,13 @@
 	                  <th>Fecha</th>
 	                 
 	                  <th>Interes</th>
-	                  <th>I.acumulado</th>
-	                  <th>I.abonado</th>
+	                  <!-- <th>I.acumulado</th> -->
 	                  <th>I.pendiente</th>
+	                  <th>I.abonado</th>
 	                  
-	                  <th>Capital prestado</th>
-	                  <th>C.Abonado del mes</th>
-	                  <th>C.abonado general</th>
+	                  <th>C.prestado</th>
+	                  <th>C.Abonado</th>
+	                  <th>C.abonado total</th>
 	                  <th>C.pendiente</th>
 	                </tr>
 	              </thead>
@@ -92,12 +104,12 @@
 	                <tr>
 	                  <td><?= $dete ?></td>
 	                  <td><?= $interest ?></td>
-	                  <td><?= $accrued_interest ?></td>
-	                  <td><?= $interest_paid ?></td>
+	                  <!-- <td><?= $accrued_interest ?></td> -->
 	                  <td><?= $pending_interest ?></td>
+	                  <td><?= $interest_paid ?></td>
+	                  <td><?= $paid_capital ?></td>
 	                  <td><?= $increased_debt ?></td>
 	                  <td><?= $payment_month ?></td>
-	                  <td><?= $paid_capital ?></td>
 	                  <td><?= $outstanding_capital ?></td> 
 	                </tr>
 	            	<?php } ?>

@@ -14,7 +14,7 @@
     <!-- <div class="good-message-update-data-base" id="info-updete-database"></div> -->
   
     <ul class="app-breadcrumb breadcrumb" style="padding: 10px; background: #d4cb4b; font-size: 15px;">
-      
+      <!-- <li class="breadcrumb-item" ><button class="btn btn-info" id="tempAction">ACCION</button></li> -->
       <li class="breadcrumb-item" id="clock">00:00:00</li>
       <li class="breadcrumb-item">
         <?= date('d M Y') ?>
@@ -25,6 +25,9 @@
   <?php 
 
     //dep($data['data']);
+
+    //OBTIENE EL INTEREST TOTAL ABONADO DEL MES
+    $acurred_interest = $data['data']['ACURRED_INTEREST'][0]['ACURRED_INTEREST'];
 
     //OBTIENE EL CAPITAL ABONADO DE ESTE MES
     $total_capital_of_this_month = $data['data']['TOTAL_CAPITAL_MONTH'][0]['CAPITAL_OF_THIS_MONTH'];
@@ -40,6 +43,10 @@
     foreach($borroweds as $total) {
       $total_borrowed += $total['TOTAL_BORROWED'];
     }
+
+    $total_borrowed = $total_borrowed - $total_capital_of_this_month;
+    $total_borrowed_of_this_month = $total_borrowed_of_this_month - $total_capital_of_this_month;
+    
 
     //OBTIENE EL INTERES TOTAL PENDIENTE DE ESTE AÑO
     $total_pending_interest = $data['data']['PENDING_INTEREST'][0]['PENDING_INTEREST'];
@@ -59,6 +66,10 @@
     //OBTIENE EL NUMERO TOTAL DE MI CARTERA
     $wallet = $data['data']['WALLET_MOUNT'][0]['MOUNT'];
     
+    if($wallet < 0){
+      $wallet = 0;
+    }
+
     //dep($data['data']);
 
   ?>
@@ -71,16 +82,6 @@
           <div class="info">
             <h6>Mi capital actual</h6>
             <b><?= moneyFormat($wallet, $curr) ?></b>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="widget-small info coloured-icon">
-          <i class="icon fas fa-hand-holding-usd fa-3x"></i>
-          <div class="info">
-            <h6>Capital total pendiente</h6>
-            <b><?= moneyFormat($total_borrowed, $curr) ?></b>
           </div>
         </div>
       </div>
@@ -99,16 +100,40 @@
         <div class="widget-small warning coloured-icon">
           <i class="icon fas fa-clock fa-3x"></i>
           <div class="info">
-            <h6>Interes total pendiente de este mes</h6>
+            <h6>Intereses pendiente</h6>
             <b><?= moneyFormat($total_pending_interest, $curr) ?></b>
           </div>
         </div>
       </div>
+
+
+      <div class="col-md-3">
+        <div class="widget-small warning coloured-icon">
+          <i class="icon fas fa-file-invoice-dollar fa-3x"></i>
+          <div class="info">
+            <h6>Interes ha percibir este mes</h6>
+            <b><?= moneyFormat($total_pending_interest_of_this_month, $curr) ?></b>
+          </div>
+        </div>
+      </div>
+      
+
+      
     
     </div>
 
     <div class="row">
       
+      <div class="col-md-3">
+        <div class="widget-small info coloured-icon">
+          <i class="icon fas fa-hand-holding-usd fa-3x"></i>
+          <div class="info">
+            <h6>Capital prestado</h6>
+            <b><?= moneyFormat($total_borrowed, $curr) ?></b>
+          </div>
+        </div>
+      </div>
+
       <div class="col-md-3">
         <div class="widget-small primary coloured-icon">
           <i class="icon fas fa-handshake fa-3x"></i>
@@ -118,33 +143,26 @@
           </div>
         </div>
       </div>
-
+      
       <div class="col-md-3">
         <div class="widget-small info coloured-icon">
           <i class="icon fa fa-users fa-3x"></i>
           <div class="info">
-            <h6>Numero total de clientes activos</h6>
+            <h6>Numero total de clientes</h6>
             <b><?= $total_clients ?></b>
           </div>
         </div>
       </div>
 
-      <div class="col-md-3">
-        <div class="widget-small danger coloured-icon">
-          <i class="icon fas fa-handshake-slash fa-3x"></i>
-          <div class="info">
-            <h6>Numero total de clientes en lista negra</h6>
-            <b>pendiente</b>
-          </div>
-        </div>
-      </div>
+
+      
 
       <div class="col-md-3">
-        <div class="widget-small warning coloured-icon">
-          <i class="icon fas fa-file-invoice-dollar fa-3x"></i>
+        <div class="widget-small primary coloured-icon">
+          <i class="icon fas fa-money-bill-wave fa-3x"></i>
           <div class="info">
-            <h6>Interes ha percibir este mes</h6>
-            <b><?= moneyFormat($total_pending_interest_of_this_month, $curr) ?></b>
+            <h6>Interes abonado</h6>
+            <b><?= moneyFormat($acurred_interest, $curr) ?></b>
           </div>
         </div>
       </div>
@@ -198,7 +216,7 @@
   <!-- HELPER DEP -->
   <?php //dep($data_chars) ?>
 
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-md-12">
       <div class="tile">
         <h3 class="tile-title">Grafico mensual del año [ <?= date('Y') ?> ]</h3>
@@ -215,7 +233,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <div class="row">
     <div class="col-md-12">
@@ -228,14 +246,17 @@
                   <th>fecha</th>
                   <th>codigo</th>
                   <th>cliente</th>
+                  
                   <th>interes</th>
-                  <th>c.pendiente</th>
-                  <th>c.abonado</th>
-                  <th>i.acumulado</th>
-                  <th>i.abonado</th>
-                  <th>i.pendiente</th>
-                  <th>au.deuda</th>
-                  <th>ab.mes</th>
+                  <th>I.pendiente</th>
+                  <th>I.abonado</th>
+                  
+                  <th>C.prestado</th>
+                  <th>C.Abonado</th>
+                  <th>C.abonado total</th>
+                  <th>C.pendiente</th>
+
+
                 </tr>
               </thead>
               <tbody>
@@ -266,14 +287,14 @@
                   <td><?= $dete ?></td>
                   <td><?= $code  ?></td>
                   <td><?= $client  ?></td>
+
                   <td><?= $interest ?></td>
-                  <td><?= $outstanding_capital ?></td>
-                  <td><?= $paid_capital ?></td> 
-                  <td><?= $accrued_interest ?></td>
-                  <td><?= $interest_paid ?></td>
                   <td><?= $pending_interest ?></td>
+                  <td><?= $interest_paid ?></td>
+                  <td><?= $paid_capital ?></td>
                   <td><?= $increased_debt ?></td>
                   <td><?= $payment_month ?></td>
+                  <td><?= $outstanding_capital ?></td>
                 </tr>
 
                 <?php } ?>

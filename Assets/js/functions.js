@@ -711,9 +711,75 @@ function chargeMoney(form){
 function searchCode(){
 	let valueCode = $('#value-code').val()
 	simple_ajax('searchCode',{ code: valueCode }, function(data){
-		$('#client').html('<option value="'+data.code+'">'+data.val+'</option>')
-		$('#code_exists').html('<option value="'+data.code+'">'+data.val+'</option>')
+		if(data != undefined){
+			$('#client').html('<option value="'+data.code+'">'+data.val+'</option>')
+			$('#code_exists').html('<option value="'+data.code+'">'+data.val+'</option>')
+			chargeDataOfCurrentStatusInfo(data.data);
+		}else{
+			chargeDataOfCurrentStatusInfo(false);
+		}
+		
 	})
+}
+
+function chargeDataOfCurrentStatusInfo(data){
+	
+	const content = $('.preview-info')
+	const preview_client = $('.preview-info-client')
+
+	
+	if(data){
+
+		let background_status = 'gray'
+		let dete = new Intl.DateTimeFormat('es-MX', {day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'}).format(new Date(data.dete))
+	
+
+		$(content).css('display','block')
+		$(content).html('')
+		
+		$(preview_client).css('display','block')
+		$(preview_client).html('')
+
+		if(data.payment_status == 'pending'){
+			background_status = 'red'
+		}else if(data.payment_status == 'initial'){
+			background_status = 'orange'
+		}else{
+			background_status = 'green'
+		}
+
+
+	
+	
+		
+		let html = '<ul class="list-unstyled">'   
+	    
+	    html += '<li>C.prestado: <span class="right-colapse-text"> ------ '+data.outstanding_capital+' EUR</span></li>'
+	    html += '<li>C.Abonado: <span class="right-colapse-text"> ------ '+data.payment_month+' EUR</span></li>'
+	    html += '<li>C.abonado total: <span class="right-colapse-text"> ------ '+data.payment_month+' EUR</span></li>'
+	    html += '<li>C.pendiente: <span class="right-colapse-text"> ------ '+data.outstanding_capital+' EUR</span></li>'
+		html += '<li>Interes: <span class="right-colapse-text"> ------ '+data.interest+' EUR</span></li>'
+	    html += '<li>I.pendiente: <span class="right-colapse-text"> ------ '+data.pending_interest+' EUR</span></li>'
+	    html += '<li>I.abonado: <span class="right-colapse-text"> ------ '+data.interest_paid+' EUR</span></li>'
+		html += '</ul>'
+
+		$(content).html(html)
+
+		html = '<ul class="list-unstyled">'
+		html += '<li><span class="right-colapse-text" style="padding: 6px; color: #ffffff; background-color: '+background_status+'; border-radius: 18px; font-size: 15px;"> '+data.payment_status+'</span><h4> '+data.id_customer+'</h4></li>'
+		html += '<li><span> '+data.client.toUpperCase()+'</span></li>'
+		html += '<li><span> '+dete+'</span></li>'
+		
+		
+		
+		$(preview_client).html(html)
+	}else{
+		let html = '<center><h4 class="title-current-status">No existe ningun cliente con ese codigo.</h4></center>'
+		$(content).html(html)
+		$(preview_client).css('display', 'none')
+	}
+	
+
 }
 
 $('form').submit(function(e){
@@ -774,6 +840,20 @@ function walletPlus(form){
 	})
 }
 
+//Eta funcion esta desactivada ....
+function tempAction(){
+	
+	simple_ajax('tempAction',{hola:'hola'}, function(data){
+		confirmNotify({
+			title: 'ACCION REALIZADA',
+			text: 'TODO LISTO',
+			icon: 'success',
+			confirm_button_text: 'OK',
+			onClose: null
+		})
+	})
+}
+
 function walletRest(form){
 	let mount = $(form).find($('#rest-wallet')).val()
 	simple_ajax('walletRest',{ mount: mount }, function(data){
@@ -795,30 +875,11 @@ $('#search-code').on('click', function(e){
 	searchCode()
 })
 
-// $('#login-form').on('submit', function(e){
-// 	e.preventDefault()
-// 	login(e.target)
-// })
+$('#tempAction').on('click', function(e){
+	tempAction()
+})
 
-// $('#new-client-form').on('submit', function(e){
-// 	e.preventDefault()
-// 	addNewUser(e.target);
-// })
 
-// $('#new-loan-form').on('submit', function(e){
-// 	e.preventDefault()
-// 	addNewLoan(e.target);
-// })
-
-// $('#old-loan-form').on('submit', function(e){
-// 	e.preventDefault()
-// 	oldLoan(e.target);
-// })
-
-// $('form#charge-form').on('submit', function(e){
-// 	e.preventDefault()
-// 	chargeMoney(e.target)
-// })
 
 
 

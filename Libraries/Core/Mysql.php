@@ -288,6 +288,53 @@ class Mysql extends Connection{
 		$result = $this->update($sql, $arrval);
 	}
 
+	public function changePendingInterest($mount, $code){
+		$sql = '
+			UPDATE customers
+			SET pending_interest = ?
+			WHERE id_customer = ? 
+		';
+
+		$arrval = array($mount, $code);
+
+		$result = $this->update($sql, $arrval);
+	}
+
+	public function getCustomerPendingInterest($code){
+		$sql = '
+			SELECT pending_interest 
+			FROM customers
+			WHERE id_customer = "'.$code.'"
+		';
+
+		$response = $this->select($sql);
+
+		return $response['pending_interest'];
+	}
+
+	public function checkCurrentMonthAndUpdateRegister($mount, $code){
+
+		$sql = '
+			SELECT
+			MAX(MONTH(dete)) AS last_month,
+			interest
+			FROM payments 
+			WHERE id_customer = "'.$code.'"
+			AND MONTH(dete) < MONTH(NOW())
+		';
+
+		$response = $this->select($sql);
+
+		if(!is_null($response['last_month'])){
+			if($response['last_month'] < date('m')){
+				$this->changePendingInterest($response['interest']-$mount, $code);
+			}
+		}
+		
+
+
+	}
+
 
 }
 

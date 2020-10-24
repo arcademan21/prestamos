@@ -33,13 +33,12 @@
                   <th>codigo</th>
                   <th>cliente</th>
                   <th>interes</th>
-                  <th>c.pendiente</th>
-                  <th>c.abonado</th>
-                  <th>i.acumulado</th>
-                  <th>i.abonado</th>
-                  <th>i.pendiente</th>
-                  <th>au.deuda</th>
-                  <th>ab.mes</th>
+                  <th>I.pendiente</th>
+                  <th>I.abonado</th>
+                  <th>C.prestado</th>
+                  <th>C.Abonado</th>
+                  <th>C.abonado total</th>
+                  <th>C.pendiente</th>
                 </tr>
               </thead>
               <tbody>
@@ -70,13 +69,12 @@
                   <td><?= $code  ?></td>
                   <td><?= $client  ?></td>
                   <td><?= $interest ?></td>
-                  <td><?= $outstanding_capital ?></td>
-                  <td><?= $paid_capital ?></td> 
-                  <td><?= $accrued_interest ?></td>
-                  <td><?= $interest_paid ?></td>
                   <td><?= $pending_interest ?></td>
+                  <td><?= $interest_paid ?></td>
+                  <td><?= $paid_capital ?></td>
                   <td><?= $increased_debt ?></td>
                   <td><?= $payment_month ?></td>
+                  <td><?= $outstanding_capital ?></td>
                 </tr>
 
                 <?php } ?>

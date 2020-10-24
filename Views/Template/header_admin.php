@@ -21,7 +21,7 @@
   
   </head>
 
-  <body class="app sidebar-mini">
+  <body class="app sidebar-mini sidenav-toggled">
     
     <!-- Navbar-->
     <header class="app-header">
