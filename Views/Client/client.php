@@ -84,6 +84,7 @@
 	                  <th>C.Abonado</th>
 	                  <th>C.abonado total</th>
 	                  <th>C.pendiente</th>
+	                  <th>T.movimiento</th>
 	                </tr>
 	              </thead>
 	              <tbody>
@@ -99,6 +100,21 @@
 		                    $pending_interest = moneyFormat($data['pending_interest'], $curr);
 		                    $increased_debt = moneyFormat($data['increased_debt'], $curr);
 		                    $payment_month = moneyFormat($data['payment_month'], $curr);
+		                    $type_text_transaction = $data['type_transaction'];
+
+		                    if($type_text_transaction == 'charge'){
+		                    	$type_text_transaction = 'Abono';
+		                    	$type_class_transaction = 'type-text-transaction-charge';
+		                    }else if($type_text_transaction == 'borrow'){
+		                    	$type_text_transaction = 'Prestamo';
+		                    	$type_class_transaction = 'type-text-transaction-borrow';
+		                    }else if($type_text_transaction == 'updated'){
+		                    	$type_text_transaction = 'Automatico';
+		                    	$type_class_transaction = 'type-text-transaction-updated';
+		                    }else{
+		                    	$type_text_transaction = 'Manual';
+		                    	$type_class_transaction = 'type-text-transaction-unespected';
+		                    }
 
 	                ?>
 	                <tr>
@@ -111,6 +127,7 @@
 	                  <td><?= $increased_debt ?></td>
 	                  <td><?= $payment_month ?></td>
 	                  <td><?= $outstanding_capital ?></td> 
+	                  <td class="type-tansaction-td <?= $type_class_transaction ?>"><span><?= $type_text_transaction ?></span></td>
 	                </tr>
 	            	<?php } ?>
 	                

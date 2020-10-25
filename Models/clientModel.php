@@ -34,7 +34,8 @@ $query = '
 	dete,
 	increased_debt,
 	payment_month,
-	outstanding_capital
+	outstanding_capital,
+	type_transaction
 	FROM payments
 	WHERE id_customer = "'.$client_code.'"
 	OR client = "'.strtolower($client_code).'"

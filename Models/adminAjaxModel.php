@@ -239,11 +239,11 @@ public function updatedIt($data, $month){
 				pending_interest,
 				paid_capital,
 				increased_debt,
-				payment_month
-			) VALUES (?,?,?,?,?,?,?,?,?,?,?)
+				payment_month,
+				type_transaction
+			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
 		';
 
-		
 		$outstanding_capital = $response['outstanding_capital'];
 		$payment_month = $response['payment_month'];
 
@@ -272,7 +272,8 @@ public function updatedIt($data, $month){
 			$pending_interest,
 			0,
 			0,
-			$payment_month
+			$payment_month,
+			'updated'
 		);
 
 		//dep($arrval);
@@ -625,8 +626,9 @@ public function addNewLoan($params=null){
 					interest,
 					pending_interest,
 					increased_debt,
-					paid_capital
-				)VALUE(?,?,?,?,?,?,?,?)
+					paid_capital,
+					type_transaction
+				)VALUE(?,?,?,?,?,?,?,?,?)
 			';
 
 			$data = array(
@@ -638,7 +640,8 @@ public function addNewLoan($params=null){
 				//($params->initial_loan/100) * $params->interest,
 				0,
 				0,
-				$params->initial_loan
+				$params->initial_loan,
+				'borrow'
 			);
 
 			$this->insert($sql, $data);
@@ -748,8 +751,9 @@ public function addExistsLoan($params=null){
 						pending_interest,
 						paid_capital,
 						increased_debt,
-						payment_month
-					)VALUES(?,?,?,?,?,?,?,?,?,?,?)	
+						payment_month,
+						type_transaction
+					)VALUES(?,?,?,?,?,?,?,?,?,?,?,?)	
 				';
 
 				//dep($params);
@@ -773,7 +777,8 @@ public function addExistsLoan($params=null){
 					$response['pending_interest'],
 					$params->initial_loan,
 					0,
-					0
+					0,
+					'borrow'
 				);
 
 				//dep($response);
@@ -906,8 +911,9 @@ public function chargeMoney($params=null){
 						pending_interest,
 						paid_capital,
 						increased_debt,
-						payment_month
-					) VALUES (?,?,?,?,?,?,?,?,?,?,?)
+						payment_month,
+						type_transaction
+					) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
 				';
 				
 				$interes_aplicated = ($response['initial_loan']/100) * $this->getInterestOfClient($params->code);
@@ -929,7 +935,8 @@ public function chargeMoney($params=null){
 					$pending_interest,
 					0,
 					0, //Este es el capital abonado
-					0
+					0,
+					'charge'
 					//$increased_debt
 				);
 				
@@ -1012,8 +1019,9 @@ public function chargeMoney($params=null){
 						pending_interest,
 						paid_capital,
 						increased_debt,
-						payment_month
-					) VALUES (?,?,?,?,?,?,?,?,?,?,?)
+						payment_month,
+						type_transaction
+					) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
 				';
 
 				// monto_abonado = 60
@@ -1068,7 +1076,8 @@ public function chargeMoney($params=null){
 					$pending_interest,
 					0, //Este es el capital prestado
 					$paid_capital,
-					$increased_debt
+					$increased_debt,
+					'charge'
 				);
 
 				//dep($data);
