@@ -967,12 +967,9 @@ public function chargeMoney($params=null){
 
 		//Aqui es cuando el inters es igual a 0
 		else{
-			
-<<<<<<< HEAD
-=======
+
 			// Caso en el que el monto abonado es superior al interes pendiente
 
->>>>>>> test
 			try {
 
 				$sql = '
