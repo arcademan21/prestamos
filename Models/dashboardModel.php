@@ -12,12 +12,12 @@ public function getAllData(){
 
 $data = [];
 
-//OBTIENE TOTAL PRESADO DEL MES
+//OBTIENE TOTAL PRESTADO DEL MES
 /*---------------------------------*/
 $query = '
 	SELECT DISTINCT
-		SUM(amount) AS BORROWED_OF_THIS_MONTH	
-	FROM deposits 
+		SUM(paid_capital) AS BORROWED_OF_THIS_MONTH	
+	FROM payments 
 	WHERE MONTH(dete) = MONTH(NOW()) 
 	AND YEAR(dete) = YEAR(NOW())	
 ';
@@ -30,7 +30,7 @@ $data['TOTAL_BORROWED_MONTH'] = $request;
 /*---------------------------------*/
 $query = '
 	SELECT DISTINCT
-		SUM(paid_capital) AS CAPITAL_OF_THIS_MONTH	
+		SUM(increased_debt) AS CAPITAL_OF_THIS_MONTH	
 	FROM payments 
 	WHERE MONTH(dete) = MONTH(NOW()) 
 	AND YEAR(dete) = YEAR(NOW())	
@@ -56,10 +56,14 @@ $data['alldata'] = $request;
 /*---------------------------------*/
 //OBTIENE CAPITAL TOTAL PENDIENTE DE ESTE AÑO
 $query = '
-	SELECT 
-	SUM(initial_loan) AS TOTAL_BORROWED
-	FROM customers	
+	SELECT DISTINCT
+		SUM(paid_capital) AS TOTAL_BORROWED
+	FROM payments 		
 ';
+
+// SELECT 
+// 	SUM(initial_loan) AS TOTAL_BORROWED
+// 	FROM customers
 
 $request = $this->select_all($query);
 $data['TOTAL_BORROWED'] = $request;
@@ -71,22 +75,38 @@ $query = '
 	SELECT 
 		SUM(pending_interest) AS PENDING_INTEREST
 	FROM payments
-	WHERE YEAR(dete) = YEAR(NOW())
-	AND MONTH(dete) = MONTH(NOW())
+	WHERE MONTH(dete) < MONTH(NOW())
+	AND YEAR(dete) = YEAR(NOW())
 ';
 
 $request = $this->select_all($query);
 $data['PENDING_INTEREST'] = $request;
 /*---------------------------------*/
 
-//OBTIENE INTERES TOTAL PENDIENTE DE ESTE MES
+//OBTIENE INTERES TOTAL ABONADO DEL MES
 /*---------------------------------*/
 $query = '
 	SELECT 
-		SUM(pending_interest) AS PENDING_INTEREST
+		SUM(interest_paid) AS ACURRED_INTEREST
 	FROM payments
 	WHERE MONTH(dete) = MONTH(NOW())
 	AND YEAR(dete) = YEAR(NOW())
+';
+
+$request = $this->select_all($query);
+$data['ACURRED_INTEREST'] = $request;
+/*---------------------------------*/
+
+//OBTIENE INTERESES TOTAL PENDIENTE DE ESTE MES
+/*---------------------------------*/
+$query = '
+	SELECT DISTINCT
+	SUM(interest) AS PENDING_INTEREST
+	FROM payments
+	WHERE id IN (SELECT MAX(id) FROM payments GROUP BY client) 
+	AND MONTH(dete) = MONTH(NOW())
+	AND YEAR(dete) = YEAR(NOW())
+	ORDER BY client
 ';
 
 $request = $this->select_all($query);

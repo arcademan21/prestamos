@@ -1,4 +1,4 @@
-<?php  
+<?php   
 
 class clientModel extends Mysql{
 
@@ -105,11 +105,10 @@ if($request['initial_loan'] == 0 AND $request['payment_status'] == 'initial'){
 
 $sql = '
 	SELECT DISTINCT
-	payments.pending_interest AS pending_interest,
+	customers.pending_interest AS pending_interest,
 	customers.initial_loan AS outstanding_capital
-	FROM payments, customers
-	WHERE payments.id_customer = "'.$client_code.'"
-	AND customers.id_customer = "'.$client_code.'"
+	FROM customers
+	WHERE id_customer = "'.$client_code.'"	
 ';
 
 $request = $this->select($sql);

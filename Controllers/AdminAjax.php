@@ -78,6 +78,10 @@ public function editClient($params=null){
 	return $this->model->editClient($params);
 }
 
+public function tempAction($params=null){
+	return $this->model->tempAction($params);
+}
+
 
 
 
