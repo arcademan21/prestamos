@@ -298,7 +298,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-md-12">
       <div class="tile">
         <h3 class="tile-title">Grafico mensual del año [ <?= date('Y') ?> ]</h3>
@@ -315,7 +315,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
 </main>
 
