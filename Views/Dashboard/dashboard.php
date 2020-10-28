@@ -36,18 +36,11 @@
     $total_borrowed_of_this_month = $data['data']['TOTAL_BORROWED_MONTH'][0]['BORROWED_OF_THIS_MONTH'];
 
     //OBTIENE EL TOTAL PRESTADO
-    $borroweds = $data['data']['TOTAL_BORROWED'];
+    $total_borrowed = $data['data']['TOTAL_BORROWED'][0]['TOTAL_BORROWED'];
     
-    $total_borrowed = 0;
-
-    foreach($borroweds as $total) {
-      $total_borrowed += $total['TOTAL_BORROWED'];
-    }
-
     $total_borrowed = $total_borrowed - $total_capital_of_this_month;
     $total_borrowed_of_this_month = $total_borrowed_of_this_month - $total_capital_of_this_month;
     
-
     //OBTIENE EL INTERES TOTAL PENDIENTE DE ESTE AÑO
     $total_pending_interest = $data['data']['PENDING_INTEREST'][0]['PENDING_INTEREST'];
 
@@ -216,31 +209,14 @@
   <!-- HELPER DEP -->
   <?php //dep($data_chars) ?>
 
-  <!-- <div class="row">
-    <div class="col-md-12">
-      <div class="tile">
-        <h3 class="tile-title">Grafico mensual del año [ <?= date('Y') ?> ]</h3>
-        <div class="content-select-option-time-chart justify-content-end">
-          <select name="" id="times-chart">
-            <option value="0">HASTA AHORA</option>
-            <option value="1">PRIMER TRIMESTRE</option>
-            <option value="2">SEGUNDO TRIMESTRE</option>
-            <option value="3">TERCER TRIMESTRE</option>
-          </select>
-        </div>
-        <div class="embed-responsive embed-responsive-16by9">
-          <canvas class="embed-responsive-item" id="lineChartDemo" width="520" height="293" style="width: 520px; height: 293px;"></canvas>
-        </div>
-      </div>
-    </div>
-  </div> -->
+  
 
   <div class="row">
     <div class="col-md-12">
       <div class="tile">
         <div class="tile-body">
           <div class="table-responsive">
-            <table class="table table-hover table-bordered" id="sampleTable">
+            <table class="table table-hover table-bordered" id="table_dashboard">
               <thead>
                 <tr>
                   <th>fecha</th>
@@ -322,7 +298,24 @@
     </div>
   </div>
 
-  
+  <div class="row">
+    <div class="col-md-12">
+      <div class="tile">
+        <h3 class="tile-title">Grafico mensual del año [ <?= date('Y') ?> ]</h3>
+        <div class="content-select-option-time-chart justify-content-end">
+          <select name="" id="times-chart">
+            <option value="0">HASTA AHORA</option>
+            <option value="1">PRIMER TRIMESTRE</option>
+            <option value="2">SEGUNDO TRIMESTRE</option>
+            <option value="3">TERCER TRIMESTRE</option>
+          </select>
+        </div>
+        <div class="embed-responsive embed-responsive-16by9">
+          <canvas class="embed-responsive-item" id="lineChartDemo" width="520" height="293" style="width: 520px; height: 293px;"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </main>
 

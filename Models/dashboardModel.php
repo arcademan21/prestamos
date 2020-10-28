@@ -15,11 +15,8 @@ $data = [];
 //OBTIENE TOTAL PRESTADO DEL MES
 /*---------------------------------*/
 $query = '
-	SELECT DISTINCT
-		SUM(paid_capital) AS BORROWED_OF_THIS_MONTH	
-	FROM payments 
-	WHERE MONTH(dete) = MONTH(NOW()) 
-	AND YEAR(dete) = YEAR(NOW())	
+	SELECT borrowed_this_month AS BORROWED_OF_THIS_MONTH	
+	FROM global_info 	
 ';
 
 $request = $this->select_all($query);
@@ -29,11 +26,8 @@ $data['TOTAL_BORROWED_MONTH'] = $request;
 //OBTIENE CAPITAL ABONADO DEL MES
 /*---------------------------------*/
 $query = '
-	SELECT DISTINCT
-		SUM(increased_debt) AS CAPITAL_OF_THIS_MONTH	
-	FROM payments 
-	WHERE MONTH(dete) = MONTH(NOW()) 
-	AND YEAR(dete) = YEAR(NOW())	
+	SELECT capital_borrow_this_month CAPITAL_OF_THIS_MONTH	
+	FROM global_info 	
 ';
 
 $request = $this->select_all($query);
@@ -56,14 +50,9 @@ $data['alldata'] = $request;
 /*---------------------------------*/
 //OBTIENE CAPITAL TOTAL PENDIENTE DE ESTE AÑO
 $query = '
-	SELECT DISTINCT
-		SUM(paid_capital) AS TOTAL_BORROWED
-	FROM payments 		
+	SELECT total_borrow AS TOTAL_BORROWED
+	FROM global_info 		
 ';
-
-// SELECT 
-// 	SUM(initial_loan) AS TOTAL_BORROWED
-// 	FROM customers
 
 $request = $this->select_all($query);
 $data['TOTAL_BORROWED'] = $request;
@@ -72,11 +61,8 @@ $data['TOTAL_BORROWED'] = $request;
 //OBTIENE INTERES TOTAL PENDIENTE DE ESTE AÑO
 /*---------------------------------*/
 $query = '
-	SELECT 
-		SUM(pending_interest) AS PENDING_INTEREST
-	FROM payments
-	WHERE MONTH(dete) < MONTH(NOW())
-	AND YEAR(dete) = YEAR(NOW())
+	SELECT all_pending_interest AS PENDING_INTEREST
+	FROM global_info
 ';
 
 $request = $this->select_all($query);
@@ -86,11 +72,8 @@ $data['PENDING_INTEREST'] = $request;
 //OBTIENE INTERES TOTAL ABONADO DEL MES
 /*---------------------------------*/
 $query = '
-	SELECT 
-		SUM(interest_paid) AS ACURRED_INTEREST
-	FROM payments
-	WHERE MONTH(dete) = MONTH(NOW())
-	AND YEAR(dete) = YEAR(NOW())
+	SELECT all_interest_paid AS ACURRED_INTEREST
+	FROM global_info
 ';
 
 $request = $this->select_all($query);
@@ -100,13 +83,8 @@ $data['ACURRED_INTEREST'] = $request;
 //OBTIENE INTERESES TOTAL PENDIENTE DE ESTE MES
 /*---------------------------------*/
 $query = '
-	SELECT DISTINCT
-	SUM(interest) AS PENDING_INTEREST
-	FROM payments
-	WHERE id IN (SELECT MAX(id) FROM payments GROUP BY client) 
-	AND MONTH(dete) = MONTH(NOW())
-	AND YEAR(dete) = YEAR(NOW())
-	ORDER BY client
+	SELECT interest_this_month AS PENDING_INTEREST
+	FROM global_info
 ';
 
 $request = $this->select_all($query);
@@ -169,7 +147,6 @@ $data['STADISTICS_BORROWED_MONTH'] = $request;
 //Capital abonado 
 $query = '
 	
-
 	SELECT DISTINCT
 		MAX(dete) AS DATES,
 		SUM(paid_capital) AS PAID_CAPITAL	
@@ -218,8 +195,6 @@ $query = '
 
 $request = $this->select_all($query);
 $data['STADISTICS_INTEREST_PAID_MONTH'] = $request;
-
-
 
 /*---------------------------------*/
 //OBTIENE DATOS DE MI CARTERA

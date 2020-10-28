@@ -241,18 +241,14 @@
 }
 
 .type-text-transaction-charge{
-  
-  background: #55edd6;
-  
+  background: #409689;
   color: #ffffff;
-  text-shadow: 1px 1px 1px #409689;
+  text-shadow: 1px 1px 1px #22534c;
   font-weight: 600;
 }
 
 .type-text-transaction-borrow{
-  
-  background: #edbe55;
-  
+  background: #f8c146;
   color: #ffffff;
   text-shadow: 1px 1px 1px #9d7826;
   font-weight: 600;

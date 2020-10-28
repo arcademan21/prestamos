@@ -44,6 +44,10 @@
 			return $this->model->saveHistorial();
 		}
 
+		public function updateGlobalInfo(){
+			return $this->model->updateGlobalInfo();
+		}
+
 
 
 		

@@ -28,21 +28,25 @@ public function updateRegisters($params=null){
 		
 		$response = $this->select_all($sql);
 
-		//dep($response);
-
 		//Recoriendo registros en busca de fechas 
 
-		$month = date('m');
+		// $month = date('m');
 
-		if(date('m', strtotime($response[0]['dete'])) < $month){
+		// if(date('m', strtotime($response[0]['dete'])) < $month){
 
-			foreach($response as $data) {
-				
-				$exect = $this->updateOneRegister($data, date('m'));
-				//dep($exect);
-				array_push($arrResult, $exect);
-			}
+		// 	foreach($response as $data) {
+		// 		dep($data[0]);
+		// 		$exect = $this->updateOneRegister($data, date('m'));
+		// 		//dep($exect);
+		// 		array_push($arrResult, $exect);
+		// 	}
 
+		// }
+
+		foreach($response as $data) {
+			$exect = $this->updateOneRegister($data, date('m'));
+			//dep($exect);
+			array_push($arrResult, $exect);
 		}
 
 		//dep(count($arrResult));
@@ -152,28 +156,35 @@ public function updateOneRegister($data, $month){
 
 	//dep($response);
 
-	$year_and_month = date('Y-m');
-	if(date('Y-m', strtotime($response['updated_date'])) != $year_and_month){
+	$year_and_month = date('m');
+	if(date('m', strtotime($response['updated_date'])) != $year_and_month){
 		
-		$sql = '
-			SELECT * 
-			FROM customers 
-			WHERE id_customer = "'.$data['id_customer'].'"
-			AND MONTH(updated_on) = MONTH(NOW())
-			AND DAY(updated_on) = DAY(NOW())
-		';
+		// $sql = '
+		// 	SELECT * 
+		// 	FROM customers 
+		// 	WHERE id_customer = "'.$data['id_customer'].'"
+		// 	AND MONTH(updated_on) = MONTH(NOW())
+		// 	AND DAY(updated_on) = DAY(NOW())
+		// ';
 
-		$response = $this->select($sql);
+		// $response = $this->select($sql);
 
-		if(!$response){
-			return $this->updatedIt($data, $month);
-		}else{
-			return json_encode([
-				'status'=> 'OK',
-				'message'=> 'Base de datos actualizada sin cambios'
-			]);
-		}
+		return $this->updatedIt($data, $month);
+		
+		// if(!$response){
+		// 	return $this->updatedIt($data, $month);
+		// }else{
+		// 	return json_encode([
+		// 		'status'=> 'OK',
+		// 		'message'=> 'Base de datos actualizada sin cambios'
+		// 	]);
+		// }
 
+	}else{
+		return json_encode([
+			'status'=> 'OK',
+			'message'=> 'Base de datos actualizada sin cambios'
+		]);
 	}
 
 }	
@@ -218,14 +229,7 @@ public function updatedIt($data, $month){
 			GROUP BY payments.client
 		';
 
-
 		$response = $this->select($sql);
-
-		// $date = $data['dete'];
-		// $month = date('m', strtotime($data['dete']));
-		// $day = date('d', strtotime($data['dete']));
-		// $year = date('Y', strtotime($data['dete']));
-		// $client = $data['client'];
 
 		$sql = '
 			INSERT INTO payments(
@@ -276,10 +280,11 @@ public function updatedIt($data, $month){
 			'updated'
 		);
 
-		//dep($arrval);
+		dep($arrval);
 
 		$result = $this->insert($sql, $arrval);
 		$this->changePendingInterest($pending_interest, $response['id_customer']);
+		$this->updateGlobalInfo();
 
 		array_push($arrResult, $arrval);
 
@@ -598,22 +603,6 @@ public function addNewLoan($params=null){
 	if(!$response){
 
 		try {
-
-
-			// $sql = '
-			// 	SELECT initial_loan
-			// 	FROM customers
-			// 	WHERE id_customer = "'.$response['id_customer'].'"
-			// ';
-
-			// $response = $this->select($sql);
-
-			// if($response['initial_loan'] > 0){
-			// 	$initial_loan = $response['initial_loan'];
-			// }else{
-			// 	$initial_loan = $params->initial_loan;
-			// }
-			
 			
 			$addNewClient = json_decode($this->addNewClient($params));
 
@@ -637,7 +626,6 @@ public function addNewLoan($params=null){
 				date('Y-m-d H:i:s'),
 				$params->initial_loan,
 				($params->initial_loan/100) * $params->interest,
-				//($params->initial_loan/100) * $params->interest,
 				0,
 				0,
 				$params->initial_loan,
@@ -650,6 +638,7 @@ public function addNewLoan($params=null){
 			$this->changePendingInterest(($params->initial_loan/100) * $params->interest, $params->code);
 			$this->reduceWallet($params->initial_loan);
 			$this->depositsChargeData($params);
+			$this->updateGlobalInfo();
 
 			return $this->success_message('Nuevo prestamo realizado.');
 
@@ -691,17 +680,6 @@ public function addExistsLoan($params=null){
 	';
 
 	$response = $this->select($sql);
-
-
-	// if($response['pending_interest'] > 0){
-	// 	$pending_interest = $response['pending_interest'] - $params->mount;
-	// }else{
-	// 	$pending_interest = $response['pending_interest'];
-	// }
-	
-	// if($this->is_negative_number($pending_interest)){
-	// 	$pending_interest = 0;
-	// }
 
 	//dep($response);
 
@@ -790,6 +768,7 @@ public function addExistsLoan($params=null){
 				$this->changePendingInterest((($params->initial_loan+$response['initial_loan'])/100) * $params->interest, $params->code);
 				$this->reduceWallet($params->initial_loan);
 				$this->depositsChargeData($params);
+				$this->updateGlobalInfo();
 
 				return $this->success_message('Nuevo prestamo realizado.');
 
@@ -827,6 +806,14 @@ public function chargeMoney($params=null){
 			SELECT 
 				MIN(payments.outstanding_capital) AS outstanding_capital,
 				MIN(payments.interest) AS min_interest,
+				(SELECT interest 
+	             FROM payments 
+	             WHERE id_customer = "'.$params->code.'" 
+	             ORDER BY dete DESC LIMIT 1) AS last_interest,
+	            (SELECT pending_interest 
+	             FROM payments 
+	             WHERE id_customer = "'.$params->code.'" 
+	             ORDER BY dete DESC LIMIT 1) AS last_pending_interest, 
                 (SELECT pending_interest
              	FROM payments 
              	WHERE id_customer = "'.$params->code.'" 
@@ -853,6 +840,9 @@ public function chargeMoney($params=null){
 
 		$increased_debt = $response['increased_debt'];
 
+
+
+
 		if($response['pending_interest'] > 0){
 			$pending_interest = $response['pending_interest'] - $params->mount;
 		}else{
@@ -870,7 +860,6 @@ public function chargeMoney($params=null){
 
 			try {
 
-				
 				$sql = '
 					SELECT initial_loan 
 					FROM customers
@@ -921,7 +910,6 @@ public function chargeMoney($params=null){
 				$interest_paid = ($params->mount/100) * $this->getInterestOfClient($params->code);
 				$paid_capital = $params->mount - ($params->mount/100) * $this->getInterestOfClient($params->code);
 				
-				
 				//dep($increased_debt);
 
 				$data = array(
@@ -940,15 +928,14 @@ public function chargeMoney($params=null){
 					//$increased_debt
 				);
 				
-
 				$this->insert($sql, $data);
 				$this->changePaymentStatus('pending', $params->code);
 				$this->changePendingInterest($this->getCustomerPendingInterest($params->code) - $params->mount, $params->code);
+				$this->updateGlobalInfo();
 				//$this->changeIntialLoan($response['initial_loan']-$paid_capital, $params->code);
 				//$this->checkCurrentMonthAndUpdateRegister($params->mount, $params->code);
 				//$this->walletOnlyPlus($params->mount);
-				//dep('ENTRA 1');
-
+				
 				return $this->success_message('Abono realizado correctamente.');
 
 				
@@ -958,25 +945,17 @@ public function chargeMoney($params=null){
 			}
 		}
 
-		//Aqui es cuando se salda la cuenta
-		if($params->mount >= ($initial_loan + $interest)){
-			
-			$this->saveHistorial($params->code);
-			$this->changePaymentStatus('solved', $params->code);
-			$this->changeIntialLoan(0, $params->code);
-			$this->changePendingInterest(0, $params->code);
-			$this->walletOnlyPlus($params->mount);
-			$this->deleterRegisters($params->code);
-			
-			return $this->success_message('Abono realizado correctamente. El cliente ha saldado su cuenta.');
-
+		$solved_mount = 0;
+		if($interest == 0){
+			$solved_mount = $initial_loan + $response['last_interest'];
+		}else{
+			$solved_mount = $initial_loan + $interest;
 		}
 
-		//Aqui es cuando el inters es igual a 0
-		else{
-
-			// Caso en el que el monto abonado es superior al interes pendiente
-
+		
+		//Aqui es cuando se salda la cuenta
+		if($params->mount >= $solved_mount){
+			
 			try {
 
 				$sql = '
@@ -986,8 +965,6 @@ public function chargeMoney($params=null){
 				';
 
 				$response = $this->select($sql);
-
-				
 
 				$sql = '
 					INSERT INTO deposits(
@@ -1024,28 +1001,10 @@ public function chargeMoney($params=null){
 					) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
 				';
 
-				// monto_abonado = 60
-				// capital_pendiente = 1000
-				// interes_pendiente = 25
-
 				$interest_less = $params->mount - $this->getCustomerPendingInterest($params->code);
 				$interest_paid = $params->mount - $interest_less;
 				$paid_capital = $params->mount;
 				$paid_interest = 0;
-
-				// dep([
-				// 	'01'=>$interest_less,
-				// 	'02'=>$interest_paid
-				// ]);
-
-
-				//$interest_less = $response['initial_loan'] - $params->mount;
-				//$interest_paid = ($params->mount/100) * $this->getInterestOfClient($params->code);
-				//$paid_capital = $params->mount - ($params->mount/100) * $this->getInterestOfClient($params->code);
-				
-				//dep(250%10);
-
-				//dep($increased_debt);
 
 				if($increased_debt == 0){
 					$increased_debt = $params->mount - $this->getCustomerPendingInterest($params->code);
@@ -1083,19 +1042,318 @@ public function chargeMoney($params=null){
 				//dep($data);
 
 				$this->insert($sql, $data);
-				$this->changePaymentStatus('pending', $params->code);
-				$this->changeIntialLoan(($response['initial_loan']-$interest_less), $params->code);
-				$this->changePendingInterest($this->getCustomerPendingInterest($params->code) - $interest_paid, $params->code);
-				//$this->checkCurrentMonthAndUpdateRegister($params->mount, $params->code);
-				$this->walletOnlyPlus($interest_less);
-				//dep('ENTRA 2');
-
-				return $this->success_message('Abono realizado correctamente.');
+				
+				$this->changePaymentStatus('solved', $params->code);
+				$this->changeIntialLoan(0, $params->code);
+				$this->changePendingInterest(0, $params->code);
+				$this->walletOnlyPlus($params->mount);
+				$this->saveHistorial($params->code);
+				$this->updateGlobalInfo();
+				$this->deleterRegisters($params->code);
+			
+				return $this->success_message('Abono realizado correctamente. El cliente ha saldado su cuenta.');
 
 				
-			} catch (PDOException $e) {
+			}catch (PDOException $e) {
 				//echo 'Error: '.$e->getMessage();
 				return $this->error_message('Ha ocurrido un error al intentar abonar el dinero');
+			}
+			
+
+		}
+
+		//Aqui es cuando el inters es igual a 0
+		else{
+
+			// Caso en el que el monto abonado es superior al interes pendiente
+			$last_interest = $response['last_interest'];
+			$last_pending_interest = $response['last_pending_interest'];
+
+			//dep('Last Interest => '.$last_interest);
+			
+			if($last_interest > 0 and $interest < 1){
+				
+				try {
+
+					$sql = '
+						SELECT initial_loan 
+						FROM customers
+						WHERE id_customer = "'.$params->code.'"
+					';
+
+					$response = $this->select($sql);
+
+					$sql = '
+						INSERT INTO deposits(
+							id_customer,
+							client,
+							dete,
+							amount
+						) VALUES (?,?,?,?)
+					';
+
+					$data = array(
+						$params->code,
+						$params->name,
+						date('Y-m-d H:i:s'),
+						$params->mount
+					);
+
+					$this->insert($sql, $data);
+
+					$sql = '
+						INSERT INTO payments(
+							id_customer,
+							client,
+							dete,
+							outstanding_capital,
+							interest,
+							accrued_interest,
+							interest_paid,
+							pending_interest,
+							paid_capital,
+							increased_debt,
+							payment_month,
+							type_transaction
+						) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+					';
+
+					//esto devuelbe 30
+					// $capital_percent = $response['initial_loan'] - $params->mount;
+					// $capital_reset = $response['initial_loan'] - $capital_percent;
+
+					//dep('resta c.pendiente - mount => '.$capital_percent);
+					//dep('resta c.pendiente - result => '.$capital_reset);
+
+
+					$paid_capital = 0;
+					$capital_percent = 0;
+
+					if($params->mount < $last_interest){
+						
+						$interest_percent = $params->mount;
+						
+
+						if($last_pending_interest < 1){
+							$interest_pending = $last_interest - $interest_percent;
+						}else{
+							$interest_pending = $last_pending_interest - $interest_percent;
+						}
+						
+
+						$paid_capital = 0;
+						$capital_percent = $response['initial_loan'];
+					}
+
+
+					else if($params->mount >= $last_interest){
+						
+
+						//$interest_percent = ($response['initial_loan']/100) * $this->getInterestOfClient($params->code);
+						$interest_percent = $last_interest + $last_pending_interest;
+						$interest_pending = 0;
+
+						if($params->mount > $last_interest + $last_pending_interest){
+							$paid_capital = $params->mount - ($last_interest + $last_pending_interest);
+							$capital_percent = $response['initial_loan'] - $paid_capital;
+						}
+
+						else if($params->mount == $last_interest + $last_pending_interest){
+							$interest_percent = $params->mount;
+							$capital_percent = $response['initial_loan'];
+						}
+
+						else if($params->mount == $last_interest){
+							$interest_percent = $params->mount;
+							$interest_pending = $last_pending_interest;
+							$capital_percent = $response['initial_loan'];
+						}
+
+						else if($params->mount < $last_interest + $last_pending_interest){
+							$interest_percent = $params->mount;
+							$interest_pending = ($last_interest + $last_pending_interest) - $params->mount;
+							$capital_percent = $response['initial_loan'];
+						}
+
+						// dep('MONTO => '.$params->mount);
+						// dep('ULTIMO INTERES => '.$last_interest);
+						// dep('ULTIMO INTERES PENDIENTE => '.$last_pending_interest);
+
+					}
+
+
+					$interest_less = $params->mount - $this->getCustomerPendingInterest($params->code);
+					$interest_paid = $params->mount - $interest_less;
+					// $paid_capital = $params->mount;
+					// $paid_interest = 0;
+
+					if($increased_debt == 0){
+						$increased_debt = $paid_capital;
+					}else if($increased_debt > 0){
+						$increased_debt = $increased_debt + $paid_capital;
+					}
+
+					//dep('Incresed debt => '.$increased_debt);
+
+					// if($this->getInterestOfClient($params->code) > 0){
+					// 	$paid_capital = $params->mount - $this->getCustomerPendingInterest($params->code);
+					// }
+
+					// if($interest > 0){
+					// 	$paid_interest = $this->getCustomerPendingInterest($params->code);
+					// }
+
+					//dep($increased_debt);
+
+					$data = array(
+						$params->code,
+						$params->name,
+						date('Y-m-d H:i:s'),
+						$capital_percent,
+						($capital_percent/100) * $this->getInterestOfClient($params->code),
+						0, //Este es el interes acumulado
+						$interest_percent,
+						$interest_pending,
+						0, //Este es el capital prestado
+						$paid_capital,
+						$increased_debt,
+						'charge'
+					);
+
+					//dep($data);
+
+					$this->insert($sql, $data);
+					$this->changePaymentStatus('pending', $params->code);
+					$this->changeIntialLoan($capital_percent, $params->code);
+					$this->changePendingInterest($this->getCustomerPendingInterest($params->code) - $interest_paid, $params->code);
+					//$this->checkCurrentMonthAndUpdateRegister($params->mount, $params->code);
+					$this->walletOnlyPlus($interest_less);
+					$this->updateGlobalInfo();
+
+					return $this->success_message('Abono realizado correctamente.');
+
+					
+				} catch (PDOException $e) {
+					//echo 'Error: '.$e->getMessage();
+					return $this->error_message('Ha ocurrido un error al intentar abonar el dinero');
+				}	
+			}else{
+				
+				try {
+
+					$sql = '
+						SELECT initial_loan 
+						FROM customers
+						WHERE id_customer = "'.$params->code.'"
+					';
+
+					$response = $this->select($sql);
+
+					$sql = '
+						INSERT INTO deposits(
+							id_customer,
+							client,
+							dete,
+							amount
+						) VALUES (?,?,?,?)
+					';
+
+					$data = array(
+						$params->code,
+						$params->name,
+						date('Y-m-d H:i:s'),
+						$params->mount
+					);
+
+					$this->insert($sql, $data);
+
+					$sql = '
+						INSERT INTO payments(
+							id_customer,
+							client,
+							dete,
+							outstanding_capital,
+							interest,
+							accrued_interest,
+							interest_paid,
+							pending_interest,
+							paid_capital,
+							increased_debt,
+							payment_month,
+							type_transaction
+						) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+					';
+
+					
+
+					$interest_less = $params->mount - $this->getCustomerPendingInterest($params->code);
+					$interest_paid = $params->mount - $interest_less;
+					$paid_capital = $params->mount;
+					$paid_interest = 0;
+
+					
+
+					if($increased_debt == 0){
+						$increased_debt = $params->mount - $this->getCustomerPendingInterest($params->code);
+					}else if($increased_debt > 0){
+						$increased_debt = $increased_debt + $params->mount;
+					}
+
+					//dep($increased_debt);
+
+					if($this->getInterestOfClient($params->code) > 0){
+						$paid_capital = $params->mount - $this->getCustomerPendingInterest($params->code);
+					}
+
+					if($interest > 0){
+						$paid_interest = $this->getCustomerPendingInterest($params->code);
+					}
+
+					//dep($increased_debt);
+
+
+
+					$data = array(
+						$params->code,
+						$params->name,
+						date('Y-m-d H:i:s'),
+						$response['initial_loan']-$interest_less,
+						(($response['initial_loan']-$interest_less)/100) * $this->getInterestOfClient($params->code),
+						0, //Este es el interes acumulado
+						$paid_interest,
+						$pending_interest,
+						0, //Este es el capital prestado
+						$paid_capital,
+						$increased_debt,
+						'charge'
+					);
+
+					//dep($data);
+
+					$this->insert($sql, $data);
+					$this->changePaymentStatus('pending', $params->code);
+					$this->changeIntialLoan(($response['initial_loan']-$interest_less), $params->code);
+					$this->changePendingInterest($this->getCustomerPendingInterest($params->code) - $interest_paid, $params->code);
+					//$this->checkCurrentMonthAndUpdateRegister($params->mount, $params->code);
+					$this->walletOnlyPlus($interest_less);
+					$this->updateGlobalInfo();
+
+
+
+
+
+
+
+
+					
+
+					return $this->success_message('Abono realizado correctamente.');
+
+					
+				} catch (PDOException $e) {
+					//echo 'Error: '.$e->getMessage();
+					return $this->error_message('Ha ocurrido un error al intentar abonar el dinero');
+				}
 			}
 					
 		}

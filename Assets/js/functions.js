@@ -13,12 +13,8 @@ let limit  = 12
 let chart = null
 
 $(document).ready(function(){
-	
 	updateDatabase()
-	
-	
 })
-
 
 function updateDatabase(){
 	simple_ajax('updateRegisters', { update: 'update' }, function(data){
@@ -310,6 +306,21 @@ function setOptionsDataTables(options){
     	lengthMenu: options.lengthMenu,
 	    oLanguage: spanish,   
 	})
+
+	table_dashboard = $('#table_dashboard').DataTable({
+		order: [[ 1, "asc" ]],
+		pageLength: options.pageLength,
+    	lengthMenu: options.lengthMenu,
+	    oLanguage: spanish,   
+	})
+
+	table_list_client = $('#table_list_client').DataTable({
+		order: [[ 0, "asc" ]],
+		pageLength: options.pageLength,
+    	lengthMenu: options.lengthMenu,
+	    oLanguage: spanish,   
+	})
+
 
 	//table.order([0, 'desc']).draw();
 }

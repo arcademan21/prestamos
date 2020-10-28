@@ -40,13 +40,14 @@
       	<div class="tile">
 	        <div class="tile-body">
 	          <div class="table-responsive">
-	            <table class="table table-hover table-bordered" id="sampleTable">
+	            <table class="table table-hover table-bordered" id="table_list_client">
 	              <thead>
 	                <tr>
+	                  <th>Codigo</th>
 	                  <th>Nombre</th>
-	                  <th>Apellidos</th>
-	                  <th>Telefono</th>
-	                  <th>Idcode</th>
+	                  
+	                  <!-- <th>Apellidos</th>
+	                  <th>Telefono</th> -->
 	                  <th>Estado de la deuda</th>
 	                  <th>Inicio de la deuda</th>
 	                  <th>Opciones</th>
@@ -72,10 +73,12 @@
 	              	?>
 	              	
 	                <tr>
-	                  <td><?= ucwords($client['name']) ?></td>
-	                  <td><?= $client['full_name'] ?></td>
-	                  <td><?= $client['phone'] ?></td>
 	                  <td><?= $client['id_customer'] ?></td>
+	                  <td><?= ucwords($client['name']) ?></td>
+	                  
+	                  <!-- <td><?= $client['full_name'] ?></td>
+	                  <td><?= $client['phone'] ?></td> -->
+	                  
 	                  <td><?= $client['payment_status'] ?></td>
 	                  <td><?= date('d/m/Y H:i:s', strtotime($client['start_month'])) ?></td>
 	                  <td>
