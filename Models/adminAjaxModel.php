@@ -910,6 +910,7 @@ public function chargeMoney($params=null){
 				$interest_paid = ($params->mount/100) * $this->getInterestOfClient($params->code);
 				$paid_capital = $params->mount - ($params->mount/100) * $this->getInterestOfClient($params->code);
 				
+				//dep('caso 0 Paid capital => '.$paid_capital);
 				//dep($increased_debt);
 
 				$data = array(
@@ -1006,11 +1007,7 @@ public function chargeMoney($params=null){
 				$paid_capital = $params->mount;
 				$paid_interest = 0;
 
-				if($increased_debt == 0){
-					$increased_debt = $params->mount - $this->getCustomerPendingInterest($params->code);
-				}else if($increased_debt > 0){
-					$increased_debt = $increased_debt + $params->mount;
-				}
+				
 
 				//dep($increased_debt);
 
@@ -1023,6 +1020,14 @@ public function chargeMoney($params=null){
 				}
 
 				//dep($increased_debt);
+
+				//dep('caso 0 Paid capital => '.$paid_capital);
+
+				if($increased_debt == 0){
+					$increased_debt = $params->mount - $this->getCustomerPendingInterest($params->code);
+				}else if($increased_debt > 0){
+					$increased_debt = $increased_debt + $paid_capital;
+				}
 
 				$data = array(
 					$params->code,
@@ -1154,8 +1159,10 @@ public function chargeMoney($params=null){
 						$interest_pending = 0;
 
 						if($params->mount > $last_interest + $last_pending_interest){
+							
 							$paid_capital = $params->mount - ($last_interest + $last_pending_interest);
 							$capital_percent = $response['initial_loan'] - $paid_capital;
+							
 						}
 
 						else if($params->mount == $last_interest + $last_pending_interest){
@@ -1187,13 +1194,17 @@ public function chargeMoney($params=null){
 					// $paid_capital = $params->mount;
 					// $paid_interest = 0;
 
+					////dep('caso 1 Paid capital => '.$paid_capital);
+
+					////dep('caso 1 Incresed debt => '.$increased_debt);
+
 					if($increased_debt == 0){
 						$increased_debt = $paid_capital;
 					}else if($increased_debt > 0){
 						$increased_debt = $increased_debt + $paid_capital;
 					}
 
-					//dep('Incresed debt => '.$increased_debt);
+					////dep('caso 1 Incresed debt => '.$increased_debt);
 
 					// if($this->getInterestOfClient($params->code) > 0){
 					// 	$paid_capital = $params->mount - $this->getCustomerPendingInterest($params->code);
@@ -1291,15 +1302,9 @@ public function chargeMoney($params=null){
 					$paid_capital = $params->mount;
 					$paid_interest = 0;
 
+					//dep('caso 2 Paid capital => '.$paid_capital);
+
 					
-
-					if($increased_debt == 0){
-						$increased_debt = $params->mount - $this->getCustomerPendingInterest($params->code);
-					}else if($increased_debt > 0){
-						$increased_debt = $increased_debt + $params->mount;
-					}
-
-					//dep($increased_debt);
 
 					if($this->getInterestOfClient($params->code) > 0){
 						$paid_capital = $params->mount - $this->getCustomerPendingInterest($params->code);
@@ -1310,8 +1315,18 @@ public function chargeMoney($params=null){
 					}
 
 					//dep($increased_debt);
+					//dep('caso 2 Paid capital => '.$paid_capital);
 
+					//dep('caso 2 Incresed debt => '.$increased_debt);
 
+					if($increased_debt == 0){
+						$increased_debt = $params->mount - $this->getCustomerPendingInterest($params->code);
+					}else if($increased_debt > 0){
+						$increased_debt = $increased_debt + $paid_capital;
+					}
+
+					//dep('caso 2 Incresed debt => '.$increased_debt);
+					//dep($increased_debt);
 
 					$data = array(
 						$params->code,
