@@ -154,11 +154,11 @@ public function updateOneRegister($data, $month){
 
 	$response = $this->select($sql);
 
-	//dep($response);
+	
 
 	$year_and_month = date('m');
 	if(date('m', strtotime($response['updated_date'])) != $year_and_month){
-		
+		//dep($response);
 		// $sql = '
 		// 	SELECT * 
 		// 	FROM customers 
@@ -231,6 +231,7 @@ public function updatedIt($data, $month){
 
 		$response = $this->select($sql);
 
+
 		$sql = '
 			INSERT INTO payments(
 				id_customer,
@@ -265,10 +266,13 @@ public function updatedIt($data, $month){
 			$pending_interest = 0;
 		}
 
+		$day = '01';
+		$hour = '00:00:00';
+
 		$arrval = array(
 			$response['id_customer'],
 			$response['client'],
-			date('Y-m-d H:i:s'),
+			date('Y-m-'.$day.' '.$hour.''),
 			$outstanding_capital,
 			$interest,
 			$pending_interest,
@@ -280,7 +284,7 @@ public function updatedIt($data, $month){
 			'updated'
 		);
 
-		dep($arrval);
+		//dep($arrval);
 
 		$result = $this->insert($sql, $arrval);
 		$this->changePendingInterest($pending_interest, $response['id_customer']);
@@ -331,15 +335,7 @@ public function updatedIt($data, $month){
 
 }
 
-protected function is_negative_number($number=0){
 
-	if(is_numeric($number) and ($number<0)){
-		return true;
-	}else{
-		return false;
-	}
-
-}
 
 public function updateDatabase($params=null){
 	
@@ -486,6 +482,16 @@ public function updateDatabase($params=null){
 			'message'=> 'Ha ocurrido un error al intentar actualizar la base de datos.',
 			'data'=> false
 		]);
+	}
+
+}
+
+protected function is_negative_number($number=0){
+
+	if(is_numeric($number) and ($number<0)){
+		return true;
+	}else{
+		return false;
 	}
 
 }

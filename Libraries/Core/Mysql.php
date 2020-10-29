@@ -367,6 +367,8 @@ class Mysql extends Connection{
 			$all_interest_paid
 		);
 
+		//dep($arrval);
+
 		$this->update($sql, $arrval);
 
 
