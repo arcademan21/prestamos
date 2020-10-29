@@ -328,6 +328,7 @@
 <!-- DataTable plugin-->
 <script type="text/javascript" src="<?php echo media() ?>/js/plugins/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="<?php echo media() ?>/js/plugins/dataTables.bootstrap.min.js"></script>
+<!-- <script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.21/api/sum().js"></script> -->
 
 <!-- functions.js -->
 <script src="<?php echo media() ?>/js/functions.js"></script>

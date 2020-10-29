@@ -14,6 +14,7 @@ let chart = null
 
 $(document).ready(function(){
 	updateDatabase()
+	
 })
 
 function updateDatabase(){
@@ -321,7 +322,8 @@ function setOptionsDataTables(options){
 	    oLanguage: spanish,   
 	})
 
-
+	// let sum = $(table_dashboard[0]).DataTable().column(7).data().sum()
+	// console.log(sum)
 	//table.order([0, 'desc']).draw();
 }
 
